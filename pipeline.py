@@ -49,16 +49,8 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
     finalize_loh(adtex_dir)
 
 
-def build_coverage():
-    pass
-
-
 def run_adtex():
     pass
-
-
-
-
 
 
 if __name__ == '__main__':
