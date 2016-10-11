@@ -2,9 +2,10 @@ import os
 import sys
 
 from baf_from_vcf import baf_from_vcf
+from get_loh_intervals_adtex import finalize_loh
 
 
-def run_cnv(vcf_path,
+def run_cnv(vcf_path, adtex_dir=None,
             baf_path=None, feather_path=None, col_normal=10, col_tumor=11,
             format_dp_index=5, mq_cutoff=30, chroms=None):
 
@@ -18,6 +19,24 @@ def run_cnv(vcf_path,
     baf_from_vcf(vcf_path, baf_path, feather_path=feather_path, col_tumor=col_tumor, col_normal=col_normal,
                  format_dp_index=format_dp_index, mq_cutoff=mq_cutoff,
                  chroms=chroms)
+
+    build_coverage()
+
+    run_adtex()
+
+    finalize_loh(adtex_dir)
+
+
+def build_coverage():
+    pass
+
+
+def run_adtex():
+    pass
+
+
+
+
 
 
 if __name__ == '__main__':
