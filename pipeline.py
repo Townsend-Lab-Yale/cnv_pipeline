@@ -1,5 +1,5 @@
 import os
-import sys
+import argparse
 
 from baf_from_vcf import baf_from_vcf
 from build_coverage_files import build_genome_file, build_coverage_files
@@ -54,5 +54,15 @@ def run_adtex():
 
 
 if __name__ == '__main__':
-    vcf_path = sys.argv[1]
-    run_cnv(vcf_path)
+    parser = argparse.ArgumentParser("CNV PIPELINE")
+    parser.add_argument('-v', '--vcf', help='VCF file for sample pair [REQUIRED]')
+    parser.add_argument('-s', '--sample_dir', help='Sample-specific intermediate output dir', required=True)
+    parser.add_argument('-t', '--tumor', help='Tumor BAM', required=True)
+    parser.add_argument('-n', '--normal', help='Normal BAM', required=True)
+    parser.add_argument('-a', '--adtex_dir', help='ADTEx output dir', default=None)
+    parser.add_argument("--ploidy", help="Most common ploidy in the tumour sample [2]")
+    parser.add_argument("--minReadDepth", help="The threshold for minimum read depth for each exon [10]", default=10)
+
+    args = parser.parse_args()
+    run_cnv(vcf_path=args.vcf, sample_dir=args.sample_dir, adtex_dir=args.adtex_dir,
+            tumor_bam=args.tumor, normal_bam=args.normal)
