@@ -7,7 +7,7 @@ import feather
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
 
-def baf_from_vcf(patient_id, vcf_path, baf_path, feather_path=None, col_tumor=11, col_normal=10,
+def baf_from_vcf(vcf_path, baf_path, feather_path=None, col_tumor=11, col_normal=10,
                  format_dp_index=5, mq_cutoff=30,
                  chroms='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,MT'):
     """
