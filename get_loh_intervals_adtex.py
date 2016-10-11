@@ -1,18 +1,23 @@
 """Parse ADTEx results, identify LOH-SNP CNV intervals, trim and plot."""
 
 import os
-import sys
 import shlex
 import subprocess
 
 import pandas as pd
-import feather
+
 
 from plot_chr_axis import plot_chr_axis, plot_chr_intervals
 
 
 chroms = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 
-              '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT']
+          '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT']
+
+
+def finalize_loh(proj_dir):
+    zygosity_df, loh_segs = prep_loh_dataframes(proj_dir)
+    loh_segs = trim_loh_intervals(zygosity_df, loh_segs, out_dir=proj_dir)  # min_ratio=0.8
+    plot_loh(loh_segs, zygosity_df, out_dir=proj_dir)
 
 
 def prep_loh_dataframes(proj_dir):
@@ -149,22 +154,6 @@ def plot_loh(loh, z, out_dir=None, yvar='tumor_BAF'):
 
 
 if __name__ == '__main__':
-    
-    # ZYGOSITY RESULTS, LOH SEGMENTS
     import sys
     proj_dir = sys.argv[1]
-    # if len(sys.argv)>2:
-    #     res_path = sys.argv[2]
-    #     interval_path = sys.argv[3]
-    # else:
-    #     res_path = 'zygosity/zygosity.res'
-    #     interval_path = 'loh_intervals.bed'
-
-    # res_path = '/Users/sgg/Desktop/ram_vcf_prep_test_for_adtex/test_data/res_files/23996.res'
-    # interval_path = '/Users/sgg/Desktop/ram_vcf_prep_test_for_adtex/test_data/cnv_interval.bed'
-
-    zygosity_df, loh_segs = prep_loh_dataframes(proj_dir)
-    loh_segs = trim_loh_intervals(zygosity_df, loh_segs, out_dir=proj_dir)  # min_ratio=0.8
-    plot_loh(loh_segs, zygosity_df, out_dir=proj_dir)
-    # genome_info = GenomeInfo()
-    # plot_loh(sample_id, zygosity_df, loh_segs, genome_info, alpha=0.1)
+    finalize_loh(proj_dir)
