@@ -1,5 +1,7 @@
 import os
 import argparse
+import subprocess
+import shlex
 
 from baf_from_vcf import baf_from_vcf
 from build_coverage_files import build_genome_file, build_coverage_files
@@ -44,13 +46,44 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
                          tumor_cov_path=tumor_cov_path, normal_cov_path=normal_cov_path,
                          target_bed_path=target_path)
 
-    run_adtex()
+    run_adtex(normal_cov_path=normal_cov_path,
+              tumor_cov_path=tumor_cov_path,
+              adtex_dir=adtex_dir,
+              baf_path=baf_path,
+              target_path=target_path)
 
     finalize_loh(adtex_dir)
 
 
-def run_adtex():
-    pass
+def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_path=None, target_path=None,
+              stdout_path=None):
+    """ Example call from bash:
+        python2 ADTEx_sgg.py --DOC \
+        -n ${pdir}/cov_normal.bed \
+        -t ${pdir}/cov_tumor.bed \
+        -o ${pdir}/adtex_try1 --baf ${pdir}/baf.txt \
+        --bed $coding_bed --estimatePloidy --plot \
+        > ${pdir}/run_info.txt 2>&1
+    """
+    if stdout_path is None:
+        stdout_path = os.path.join(adtex_dir, 'run_info.txt')
+
+    python2_path = os.environ.get('PYTHON2', 'python2')
+
+    cmd = ("{python2} ADTEx_sgg.py --DOC -n {normal_cov_path} -t {tumor_cov_path} "
+           "-o {adtex_dir} --baf {baf_path} --bed {target_path} --estimatePloidy --plot")
+    cmd = cmd.format(python2=python2_path,
+                     normal_cov_path=normal_cov_path,
+                     tumor_cov_path=tumor_cov_path,
+                     adtex_dir=adtex_dir,
+                     baf_path=baf_path,
+                     target_path=target_path)
+    print("Running ADTEx with command:\n{cmd}")
+    args = shlex.split(cmd)
+    with open(stdout_path, 'w') as outfile:
+        proc = subprocess.Popen(args, stdin=subprocess.DEVNULL, stdout=outfile, stderr=outfile)
+        proc.communicate()
+    print("ADTEx run complete")
 
 
 if __name__ == '__main__':
