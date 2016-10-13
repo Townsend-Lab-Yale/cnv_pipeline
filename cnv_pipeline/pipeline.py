@@ -42,6 +42,8 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
     if target_path is None:
         os.environ.get('CODING_REGIONS')
     genome_path = os.path.join(sample_dir, "genome.txt")
+    if not os.path.exists(sample_dir):
+        os.mkdir(sample_dir)
 
     baf_from_vcf(vcf_path, baf_path, feather_path=feather_path,
                  col_tumor=col_tumor, col_normal=col_normal,

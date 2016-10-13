@@ -25,7 +25,7 @@ def baf_from_vcf(vcf_path, baf_path, feather_path=None, col_tumor=11, col_normal
         feather_path = baf_path + '.feather'
 
     # RUN Rscript
-    print("Running R script.")
+    print("Running vcf to baf conversion R script.")
     rscript_path = os.path.join(script_dir, 'vcf2table.R')
     # R: Parse vcf, write data to feather
     subprocess.check_call(['Rscript', rscript_path, vcf_path, feather_path,
