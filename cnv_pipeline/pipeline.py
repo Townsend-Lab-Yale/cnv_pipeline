@@ -1,6 +1,8 @@
 import os
 import shlex
 import subprocess
+import argparse
+
 import configparser
 
 from cnv_pipeline.baf_from_vcf import baf_from_vcf
@@ -97,3 +99,23 @@ def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_pat
         proc = subprocess.Popen(args, stdin=subprocess.DEVNULL, stdout=outfile, stderr=outfile)
         proc.communicate()
     print("ADTEx run complete")
+
+
+def main():
+    parser = argparse.ArgumentParser("CNV PIPELINE")
+    parser.add_argument('-v', '--vcf', help='VCF file for sample pair [REQUIRED]')
+    parser.add_argument('-s', '--sample_dir', help='Sample-specific intermediate output dir [OPTIONAL]', required=True)
+    parser.add_argument('-t', '--tumor', help='Tumor BAM [REQUIRED]', required=True)
+    parser.add_argument('-n', '--normal', help='Normal BAM [REQUIRED]', required=True)
+    parser.add_argument('-a', '--adtex_dir', help='ADTEx output dir', default=None)
+    parser.add_argument('-ct', '--col_tumor', help='VCF column index for tumor, 1-based', type=int, default=10)
+    parser.add_argument('-cn', '--col_normal', help='VCF column index for tumor, 1-based', type=int, default=11)
+    parser.add_argument("--ploidy", help="Most common ploidy in the tumour sample [2]", type=int, default=2)
+    parser.add_argument("--minReadDepth", help="The threshold for minimum read depth for each exon [10]",
+                        type=int, default=10)
+
+    args = parser.parse_args()
+    run_cnv(vcf_path=args.vcf, sample_dir=args.sample_dir, adtex_dir=args.adtex_dir,
+            tumor_bam=args.tumor, normal_bam=args.normal,
+            col_tumor=args.col_tumor, col_normal=args.col_normal,
+            ploidy=args.ploidy, min_read_depth=args.minReadDepth)
