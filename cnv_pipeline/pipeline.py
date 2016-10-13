@@ -11,6 +11,7 @@ from cnv_pipeline.build_coverage_files import build_genome_file, build_coverage_
 from cnv_pipeline.get_loh_intervals_adtex import finalize_loh
 
 
+this_dir = os.path.dirname(os.path.realpath(__file__))
 config = configparser.ConfigParser()
 
 
@@ -79,7 +80,7 @@ def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_pat
     if stdout_path is None:
         stdout_path = os.path.join(adtex_dir, 'run_info.txt')
 
-    config.read('config.ini')
+    config.read(os.path.join(this_dir, 'config.ini'))
 
     python2_path = config.get('paths', 'PYTHON2')
     adtex_script = config.get('paths', 'ADTEX')
