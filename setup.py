@@ -14,6 +14,6 @@ setup(name='cnv_pipeline',
       install_requires=[
           'pandas', 'feather-format', 'configparser'
       ],
-      scripts=['bin/cnv_pipeline.py'],
+      scripts=['bin/run_cnv.py'],
       zip_safe=False,
       )
