@@ -1,1 +1,0 @@
-CODING_REGIONS=/ycga-ba/home/bioinfo/software/knightlab/genomes/hs37d5/bed_files/hs37d5_refgene_coding_Nov2015.bed
