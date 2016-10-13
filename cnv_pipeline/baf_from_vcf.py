@@ -29,7 +29,7 @@ def baf_from_vcf(vcf_path, baf_path, feather_path=None, col_tumor=11, col_normal
     rscript_path = os.path.join(script_dir, 'vcf2table.R')
     # R: Parse vcf, write data to feather
     subprocess.check_call(['Rscript', rscript_path, vcf_path, feather_path,
-                           col_tumor, col_normal, format_dp_index, chroms, mq_cutoff])
+                           str(col_tumor), str(col_normal), str(format_dp_index), chroms, str(mq_cutoff)])
     # Import results
     df = feather.read_dataframe(feather_path)
 
@@ -43,7 +43,7 @@ def baf_from_vcf(vcf_path, baf_path, feather_path=None, col_tumor=11, col_normal
     # mbaf_fun = lambda x: x if x >= 0.5 else 1-x
     # df.control_BAF = df.control_BAF.apply(mbaf_fun)
     # df.tumor_BAF = df.tumor_BAF.apply(mbaf_fun)
-    df = df[['chrom', 'SNP_loc', 'control_BAF', 'tumor_BAF', 'control_doc', 'tumor_doc']]
+    df = df[['chrom', 'SNP_loc', 'control_BAF', 'tumor_BAF', 'control_doc', 'tumor_doc']].copy()
     # df.chrom = df.chrom.apply(lambda x: 'chr' + str(x) if x != 'MT' else 'chrM')
     df.dropna(inplace=True)  # Drop null entries
     df.to_csv(baf_path, sep='\t', index=False)

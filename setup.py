@@ -14,6 +14,6 @@ setup(name='cnv_pipeline',
       install_requires=[
           'pandas', 'feather-format', 'configparser'
       ],
-      entry_points={'console_scripts': ['run_cnv=cnv_pipeline.pipeline:main']},
+      entry_points={'console_scripts': ['run_cnv = cnv_pipeline.pipeline:main']},
       zip_safe=False,
       )
