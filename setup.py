@@ -10,7 +10,7 @@ setup(name='cnv_pipeline',
       author_email='stephen.gaffney@yale.edu',
       license='GPLv3',
       packages=['cnv_pipeline'],
-      package_data={},
+      package_data={'cnv_pipeline': ['config.ini']},
       install_requires=[
           'pandas', 'feather-format', 'configparser'
       ],
