@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import argparse
 
 from cnv_pipeline.pipeline import run_cnv
