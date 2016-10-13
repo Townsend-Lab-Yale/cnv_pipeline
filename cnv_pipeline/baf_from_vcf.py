@@ -24,12 +24,15 @@ def baf_from_vcf(vcf_path, baf_path, feather_path=None, col_tumor=11, col_normal
     if feather_path is None:
         feather_path = baf_path + '.feather'
 
-    # RUN Rscript
-    print("Running vcf to baf conversion R script.")
-    rscript_path = os.path.join(script_dir, 'vcf2table.R')
-    # R: Parse vcf, write data to feather
-    subprocess.check_call(['Rscript', rscript_path, vcf_path, feather_path,
-                           str(col_tumor), str(col_normal), str(format_dp_index), chroms, str(mq_cutoff)])
+    if not os.path.exists(feather_path):
+        # RUN Rscript
+        print("Running vcf to baf conversion R script.")
+        rscript_path = os.path.join(script_dir, 'vcf2table.R')
+        # R: Parse vcf, write data to feather
+        subprocess.check_call(['Rscript', rscript_path, vcf_path, feather_path,
+                               str(col_tumor), str(col_normal), str(format_dp_index), chroms, str(mq_cutoff)])
+    else:
+        print("Loading pre-existing baf feather file ({}).".format(feather_path))
     # Import results
     df = feather.read_dataframe(feather_path)
 
