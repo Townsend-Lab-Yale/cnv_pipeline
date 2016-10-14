@@ -3,16 +3,10 @@ import shlex
 import subprocess
 import argparse
 
-import configparser
-
 from cnv_pipeline.baf_from_vcf import baf_from_vcf
 from cnv_pipeline.build_coverage_files import build_genome_file, build_coverage_files
-
+from cnv_pipeline.config import load_config
 from cnv_pipeline.get_loh_intervals_adtex import finalize_loh
-
-
-this_dir = os.path.dirname(os.path.realpath(__file__))
-config = configparser.ConfigParser()
 
 
 def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_bam=None,
@@ -41,7 +35,7 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
     if chroms is None:
         chroms = '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,MT'
     if target_path is None:
-        config.read(os.path.join(this_dir, 'config.ini'))
+        config = load_config()
         target_path = config.get('paths', 'CODING_REGIONS')
     genome_path = os.path.join(sample_dir, "genome.txt")
     if not os.path.exists(sample_dir):
@@ -81,10 +75,9 @@ def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_pat
     if stdout_path is None:
         stdout_path = os.path.join(adtex_dir, 'run_info.txt')
 
-    config.read(os.path.join(this_dir, 'config.ini'))
-
-    python2_path = config.get('paths', 'PYTHON2')
-    adtex_script = config.get('paths', 'ADTEX')
+    config = load_config()
+    python2_path = config.get('paths', 'PYTHON2', 'python2')
+    adtex_script = config.get('paths', 'ADTEX', 'adtex.py')
 
     cmd = ("{python2} {adtex_script} --DOC -n {normal_cov_path} -t {tumor_cov_path} "
            "-o {adtex_dir} --baf {baf_path} --bed {target_path} --estimatePloidy --plot "
