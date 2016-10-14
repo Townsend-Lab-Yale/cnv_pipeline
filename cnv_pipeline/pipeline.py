@@ -82,7 +82,7 @@ def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_pat
 
     cmd = ("{python2} {adtex_script} --DOC -n {normal_cov_path} -t {tumor_cov_path} "
            "-o {adtex_dir} --baf {baf_path} --bed {target_path} --estimatePloidy --plot "
-           "--ploidy {ploidy} --min_read_depth {mrd}")
+           "--ploidy {ploidy} --minReadDepth {mrd}")
     cmd = cmd.format(python2=python2_path,
                      adtex_script=adtex_script,
                      normal_cov_path=normal_cov_path,
