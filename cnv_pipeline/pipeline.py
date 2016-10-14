@@ -54,12 +54,12 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
                          tumor_cov_path=tumor_cov_path, normal_cov_path=normal_cov_path,
                          target_bed_path=target_path)
 
-    run_saasCNV(sample_id=sample_id, sample_dir=sample_dir, baf_path=baf_path, stdout_path='-')
+    run_saasCNV(sample_id=sample_id, sample_dir=sample_dir, baf_path=feather_path, stdout_path='-')
 
     run_adtex(normal_cov_path=normal_cov_path,
               tumor_cov_path=tumor_cov_path,
               adtex_dir=adtex_dir,
-              baf_path=feather_path,
+              baf_path=baf_path,
               target_path=target_path,
               ploidy=ploidy, min_read_depth=min_read_depth,
               stdout_path=adtex_stdout)
