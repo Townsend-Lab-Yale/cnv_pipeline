@@ -74,7 +74,7 @@ def run_saasCNV(sample_id=None, sample_dir=None, baf_path=None, stdout_path='-')
     script_path = os.path.join(this_dir, 'run_saas.R')
     cmd = "Rscript {script_path} {s_id} {sample_dir} {baf_path} 50 30 FALSE 0.05 0.05 {script_dir}"
     cmd = cmd.format(script_path=script_path, s_id=sample_id,
-                     sample_dir=sample_dir, baf_path=os.path.realpath(baf_path),
+                     sample_dir=os.path.realpath(sample_dir), baf_path=os.path.realpath(baf_path),
                      script_dir=this_dir)
     print("Running saasCNV with command:\n  {}".format(cmd))
     args = shlex.split(cmd)

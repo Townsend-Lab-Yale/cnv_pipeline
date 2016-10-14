@@ -21,15 +21,15 @@ library(feather)
 setwd(sample_dir)
 # vcf_feather <- paste0(sample_id, '_bac.feather')  # BAF feather path
 # seq_path <- 'seq.feather'  # BAF feather path
-seq_data <- read_feather(seq_path)
-# vcf_table$CHROM <- paste0('chr', vcf_table$CHROM)  # Add chr to chrom column
+vcf.data <- read_feather(seq_path)
+vcf.data$CHROM <- paste0('chr', vcf.data$CHROM)  # Add chr to chrom column
 
-seq_data$pos <- seq_data$position
+# seq_data$pos <- seq_data$POS
 
 ## NGS pipeline analysis
 output.dir <- file.path(sample_dir, dirname)
 library(saasCNV)
-NGS.CNV_mod(seq.data=seq_data, output.dir=output.dir, sample.id=sample_id,
+NGS.CNV_mod(vcf.data=vcf.data, output.dir=output.dir, sample.id=sample_id,
         min.chr.probe=100,
         min.snps=min.snps,
         joint.segmentation.pvalue.cutoff=1e-4,

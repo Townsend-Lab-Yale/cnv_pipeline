@@ -1,5 +1,5 @@
 NGS.CNV_mod <-
-function (seq.data, output.dir, sample.id,
+function (vcf.data, output.dir, sample.id,
           min.chr.probe=100,
           min.snps=10,
           joint.segmentation.pvalue.cutoff=1e-4,
@@ -16,7 +16,7 @@ function (seq.data, output.dir, sample.id,
   if (!file.exists(output.dir)) dir.create(output.dir)
 
   ## data process
-  # seq.data <- cnv.data(vcf=vcf, min.chr.probe=min.chr.probe, verbose=verbose)
+  seq.data <- cnv.data(vcf=vcf.data, min.chr.probe=min.chr.probe, verbose=verbose)
 
   data.dir <- paste0(output.dir,"/mid_data")
     if (!file.exists(data.dir)) dir.create(data.dir)
