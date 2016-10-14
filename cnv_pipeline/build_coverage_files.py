@@ -36,7 +36,7 @@ def build_coverage_files(tumor_bam=None, normal_bam=None, genome_path=None,
     config = load_config()
     bedtools_path = config.get('paths', 'BEDTOOLS', fallback='bedtools')
 
-    cmd_template = "{bedtools_path} coverage -g {g} -d -sorted -a {target} -b {bam};"
+    cmd_template = "{bedtools_path} coverage -g {g} -d -sorted -a {target} -b {bam}"
 
     for (bam, out_path) in [(tumor_bam, tumor_cov_path), (normal_bam, normal_cov_path)]:
         print("Generating coverage for {}".format(bam))
