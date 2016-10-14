@@ -41,7 +41,8 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
     if chroms is None:
         chroms = '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,MT'
     if target_path is None:
-        os.environ.get('CODING_REGIONS')
+        config.read(os.path.join(this_dir, 'config.ini'))
+        target_path = config.get('paths', 'CODING_REGIONS')
     genome_path = os.path.join(sample_dir, "genome.txt")
     if not os.path.exists(sample_dir):
         os.mkdir(sample_dir)
