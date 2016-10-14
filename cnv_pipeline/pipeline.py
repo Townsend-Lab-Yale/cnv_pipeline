@@ -13,9 +13,9 @@ from cnv_pipeline.get_loh_intervals_adtex import finalize_loh
 
 def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_bam=None,
             baf_path=None, feather_path=None, tumor_cov_path=None, normal_cov_path=None,
-            col_normal=10, col_tumor=11, adtex_stdout=None,
+            col_normal=10, col_tumor=11, adtex_stdout='-',
             format_dp_index=5, mq_cutoff=30, chroms=None,
-            target_path=None, ploidy=None, min_read_depth=10):
+            target_path=None, ploidy=None, min_read_depth=10, sample_id='Tumor'):
     """Run pipeline.
 
     At minimum, requires vcf_path and sample_dir (for storing output).
@@ -34,8 +34,6 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
         normal_cov_path = os.path.join(sample_dir, "normal_cov.bed")
     if adtex_dir is None:
         adtex_dir = os.path.join(sample_dir, 'adtex_output')
-    if adtex_stdout is None:
-        adtex_stdout = '-'  # write to stdout
     if chroms is None:
         chroms = '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,MT'
     if target_path is None:
@@ -55,6 +53,7 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
     build_coverage_files(tumor_bam=tumor_bam, normal_bam=normal_bam, genome_path=genome_path,
                          tumor_cov_path=tumor_cov_path, normal_cov_path=normal_cov_path,
                          target_bed_path=target_path)
+    run_saasCNV(sample_id=sample_id, sample_dir=sample_dir, baf_path=baf_path, stdout_path='-')
 
     run_adtex(normal_cov_path=normal_cov_path,
               tumor_cov_path=tumor_cov_path,
@@ -65,6 +64,21 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
               stdout_path=adtex_stdout)
 
     finalize_loh(adtex_dir)
+
+
+def run_saasCNV(sample_id=None, sample_dir=None, baf_path=None, stdout_path='-'):
+    """Example call from bash:
+    Rscript run_saas.R {s_id} {sample_dir} {baf_path} 50 30 FALSE 0.05 0.05
+    """
+    cmd = "Rscript run_saas.R {s_id} {sample_dir} {baf_path} 50 30 FALSE 0.05 0.05"
+    cmd = cmd.format(s_id=sample_id, sample_dir=sample_dir,
+                     baf_path=baf_path)
+    print("Running saasCNV with command:\n{}".format(cmd))
+    args = shlex.split(cmd)
+    with smart_open(stdout_path) as outfile:
+        proc = subprocess.Popen(args, stdin=subprocess.DEVNULL, stdout=outfile, stderr=outfile)
+        proc.communicate()
+    print("saasCNV run complete")
 
 
 def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_path=None, target_path=None,
@@ -128,6 +142,7 @@ def main():
     parser.add_argument('-a', '--adtex_dir', help='ADTEx output dir', default=None)
     parser.add_argument('-ct', '--col_tumor', help='VCF column index for tumor, 1-based', type=int, default=10)
     parser.add_argument('-cn', '--col_normal', help='VCF column index for tumor, 1-based', type=int, default=11)
+    parser.add_argument('-id', '--sample_id', help='Sample name, for plot title', default='Tumor')
     parser.add_argument("--ploidy", help="Most common ploidy in the tumour sample", type=int, default=None)
     parser.add_argument("--minReadDepth", help="The threshold for minimum read depth for each exon [10]",
                         type=int, default=10)
