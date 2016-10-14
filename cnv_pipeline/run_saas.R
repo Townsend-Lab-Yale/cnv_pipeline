@@ -29,7 +29,7 @@ seq_data$pos <- seq_data$position
 ## NGS pipeline analysis
 output.dir <- file.path(sample_dir, dirname)
 library(saasCNV)
-NGS.CNV_sgg(seq.data=seq_data, output.dir=output.dir, sample.id=sample_id,
+NGS.CNV_mod(seq.data=seq_data, output.dir=output.dir, sample.id=sample_id,
         min.chr.probe=100,
         min.snps=min.snps,
         joint.segmentation.pvalue.cutoff=1e-4,
