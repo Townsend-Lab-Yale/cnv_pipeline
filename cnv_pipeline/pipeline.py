@@ -7,7 +7,7 @@ import contextlib
 
 from cnv_pipeline.baf_from_vcf import baf_from_vcf
 from cnv_pipeline.build_coverage_files import build_genome_file, build_coverage_files
-from cnv_pipeline.config import load_config
+from cnv_pipeline.config import load_config, this_dir
 from cnv_pipeline.get_loh_intervals_adtex import finalize_loh
 
 
@@ -70,9 +70,10 @@ def run_saasCNV(sample_id=None, sample_dir=None, baf_path=None, stdout_path='-')
     """Example call from bash:
     Rscript run_saas.R {s_id} {sample_dir} {baf_path} 50 30 FALSE 0.05 0.05
     """
-    cmd = "Rscript run_saas.R {s_id} {sample_dir} {baf_path} 50 30 FALSE 0.05 0.05"
-    cmd = cmd.format(s_id=sample_id, sample_dir=sample_dir,
-                     baf_path=baf_path)
+    script_path = os.path.join(this_dir, 'run_saas.R')
+    cmd = "Rscript {script_path} {s_id} {sample_dir} {baf_path} 50 30 FALSE 0.05 0.05"
+    cmd = cmd.format(script_path=script_path, s_id=sample_id,
+                     sample_dir=sample_dir, baf_path=baf_path)
     print("Running saasCNV with command:\n{}".format(cmd))
     args = shlex.split(cmd)
     with smart_open(stdout_path) as outfile:
