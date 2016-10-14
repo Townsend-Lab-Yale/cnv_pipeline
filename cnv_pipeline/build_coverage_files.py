@@ -8,7 +8,7 @@ def build_genome_file(sample_bam=None, genome_path=None):
     """Build genome file for use with bedtools coverage --sorted mode."""
 
     config = load_config()
-    sam_path = config.get('paths', 'SAMTOOLS', 'samtools')
+    sam_path = config.get('paths', 'SAMTOOLS', fallback='samtools')
 
     """samtools view -H {bam} | grep -P "@SQ\tSN:" | sed 's/@SQ\tSN://' | sed 's/\tLN:/\t/' > {genome_path}"""
     cmd1 = "{sam_path} view -H {bam}".format(sam_path=sam_path, bam=sample_bam)
@@ -34,7 +34,7 @@ def build_coverage_files(tumor_bam=None, normal_bam=None, genome_path=None,
     """
 
     config = load_config()
-    bedtools_path = config.get('paths', 'BEDTOOLS', 'bedtools')
+    bedtools_path = config.get('paths', 'BEDTOOLS', fallback='bedtools')
 
     cmd_template = "{bedtools_path} coverage -g {g} -d -sorted -a {target} -b {bam};"
 

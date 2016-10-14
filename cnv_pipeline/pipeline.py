@@ -76,8 +76,8 @@ def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_pat
         stdout_path = os.path.join(adtex_dir, 'run_info.txt')
 
     config = load_config()
-    python2_path = config.get('paths', 'PYTHON2', 'python2')
-    adtex_script = config.get('paths', 'ADTEX', 'adtex.py')
+    python2_path = config.get('paths', 'PYTHON2', fallback='python2')
+    adtex_script = config.get('paths', 'ADTEX', fallback='adtex.py')
 
     cmd = ("{python2} {adtex_script} --DOC -n {normal_cov_path} -t {tumor_cov_path} "
            "-o {adtex_dir} --baf {baf_path} --bed {target_path} --estimatePloidy --plot "
