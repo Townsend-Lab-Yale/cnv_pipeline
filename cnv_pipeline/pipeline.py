@@ -91,7 +91,7 @@ def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_pat
                      baf_path=baf_path,
                      target_path=target_path,
                      ploidy=ploidy, mrd=min_read_depth)
-    print("Running ADTEx with command:\n{cmd}".format(cmd))
+    print("Running ADTEx with command:\n{}".format(cmd))
     args = shlex.split(cmd)
     with open(stdout_path, 'w') as outfile:
         proc = subprocess.Popen(args, stdin=subprocess.DEVNULL, stdout=outfile, stderr=outfile)
