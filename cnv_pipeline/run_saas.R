@@ -7,9 +7,7 @@ max.chpts <- as.numeric(options[5])
 use.null.data <- as.logical(options[6])
 merge.pvalue.cutoff <- as.numeric(options[7])
 cnvcall.pvalue.cutoff <- as.numeric(options[8])
-script_dir <- options[9]
 
-source(file.path(script_dir, 'NGS.CNV_mod.R'))
 
 # dirname = paste0('saas_minsnps',min.snps, '_chpts', max.chpts, '_null', use.null.data, '_mergep', merge.pvalue.cutoff, '_callp', cnvcall.pvalue.cutoff)
 dirname = 'saasCNV_results'
@@ -24,12 +22,10 @@ setwd(sample_dir)
 vcf.data <- read_feather(seq_path)
 vcf.data$CHROM <- paste0('chr', vcf.data$CHROM)  # Add chr to chrom column
 
-# seq_data$pos <- seq_data$POS
-
 ## NGS pipeline analysis
 output.dir <- file.path(sample_dir, dirname)
 library(saasCNV)
-NGS.CNV_mod(vcf.data=vcf.data, output.dir=output.dir, sample.id=sample_id,
+NGS.CNV(vcf=vcf_table, output.dir=output.dir, sample.id=sample_id,
         min.chr.probe=100,
         min.snps=min.snps,
         joint.segmentation.pvalue.cutoff=1e-4,
@@ -39,4 +35,5 @@ NGS.CNV_mod(vcf.data=vcf.data, output.dir=output.dir, sample.id=sample_id,
         do.cnvcall.on.merge=TRUE,
         cnvcall.pvalue.cutoff=cnvcall.pvalue.cutoff,
         do.plot=TRUE, cex=0.3, ref.num.probe=1000,
-        seed=123456789, verbose=TRUE)
+	do.gene.anno=FALSE, seed=123456789,
+	verbose=TRUE)
