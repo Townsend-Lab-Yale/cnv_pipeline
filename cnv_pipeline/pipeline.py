@@ -57,13 +57,14 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
               adtex_dir=adtex_dir,
               baf_path=baf_path,
               target_path=target_path,
-              ploidy=ploidy, min_read_depth=min_read_depth)
+              ploidy=ploidy, min_read_depth=min_read_depth,
+              sample_dir=sample_dir)
 
     finalize_loh(adtex_dir)
 
 
 def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_path=None, target_path=None,
-              stdout_path=None, ploidy=2, min_read_depth=10):
+              stdout_path=None, ploidy=2, min_read_depth=10, sample_dir=None):
     """ Example call from bash:
         python2 ADTEx_sgg.py --DOC \
         -n ${pdir}/cov_normal.bed \
@@ -73,7 +74,7 @@ def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_pat
         > ${pdir}/run_info.txt 2>&1
     """
     if stdout_path is None:
-        stdout_path = os.path.join(adtex_dir, 'run_info.txt')
+        stdout_path = os.path.join(sample_dir, 'adtex_run_info.txt')
 
     config = load_config()
     python2_path = config.get('paths', 'PYTHON2', fallback='python2')
@@ -90,7 +91,7 @@ def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_pat
                      baf_path=baf_path,
                      target_path=target_path,
                      ploidy=ploidy, mrd=min_read_depth)
-    print("Running ADTEx with command:\n{cmd}")
+    print("Running ADTEx with command:\n{cmd}".format(cmd))
     args = shlex.split(cmd)
     with open(stdout_path, 'w') as outfile:
         proc = subprocess.Popen(args, stdin=subprocess.DEVNULL, stdout=outfile, stderr=outfile)
