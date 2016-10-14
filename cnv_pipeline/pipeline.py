@@ -53,6 +53,7 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
     build_coverage_files(tumor_bam=tumor_bam, normal_bam=normal_bam, genome_path=genome_path,
                          tumor_cov_path=tumor_cov_path, normal_cov_path=normal_cov_path,
                          target_bed_path=target_path)
+
     run_saasCNV(sample_id=sample_id, sample_dir=sample_dir, baf_path=baf_path, stdout_path='-')
 
     run_adtex(normal_cov_path=normal_cov_path,
@@ -71,10 +72,11 @@ def run_saasCNV(sample_id=None, sample_dir=None, baf_path=None, stdout_path='-')
     Rscript run_saas.R {s_id} {sample_dir} {baf_path} 50 30 FALSE 0.05 0.05
     """
     script_path = os.path.join(this_dir, 'run_saas.R')
-    cmd = "Rscript {script_path} {s_id} {sample_dir} {baf_path} 50 30 FALSE 0.05 0.05"
+    cmd = "Rscript {script_path} {s_id} {sample_dir} {baf_path} 50 30 FALSE 0.05 0.05 {script_dir}"
     cmd = cmd.format(script_path=script_path, s_id=sample_id,
-                     sample_dir=sample_dir, baf_path=baf_path)
-    print("Running saasCNV with command:\n{}".format(cmd))
+                     sample_dir=sample_dir, baf_path=baf_path,
+                     script_dir=this_dir)
+    print("Running saasCNV with command:\n  {}".format(cmd))
     args = shlex.split(cmd)
     with smart_open(stdout_path) as outfile:
         proc = subprocess.Popen(args, stdin=subprocess.DEVNULL, stdout=outfile, stderr=outfile)
@@ -111,7 +113,7 @@ def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_pat
                      baf_path=baf_path,
                      target_path=target_path,
                      ploidy_str=ploidy_str, mrd=min_read_depth)
-    print("Running ADTEx with command:\n{}".format(cmd))
+    print("Running ADTEx with command:\n  {}".format(cmd))
     args = shlex.split(cmd)
     with smart_open(stdout_path) as outfile:
         proc = subprocess.Popen(args, stdin=subprocess.DEVNULL, stdout=outfile, stderr=outfile)

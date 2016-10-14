@@ -7,8 +7,9 @@ max.chpts <- as.numeric(options[5])
 use.null.data <- as.logical(options[6])
 merge.pvalue.cutoff <- as.numeric(options[7])
 cnvcall.pvalue.cutoff <- as.numeric(options[8])
+script_dir <- options[9]
 
-source('NGS.CNV_mod.R')
+source(file.path(script_dir, 'NGS.CNV_mod.R'))
 
 # dirname = paste0('saas_minsnps',min.snps, '_chpts', max.chpts, '_null', use.null.data, '_mergep', merge.pvalue.cutoff, '_callp', cnvcall.pvalue.cutoff)
 dirname = 'saasCNV_results'
