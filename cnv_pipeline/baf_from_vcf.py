@@ -24,6 +24,10 @@ def baf_from_vcf(vcf_path, baf_path, feather_path=None, col_tumor=11, col_normal
     if feather_path is None:
         feather_path = baf_path + '.feather'
 
+    if os.path.exists(baf_path) and os.path.exists(feather_path):
+        print("BAF files exist. Skipping vcf conversion.")
+        return
+
     if not os.path.exists(feather_path):
         # RUN Rscript
         print("Running vcf to baf conversion R script.")

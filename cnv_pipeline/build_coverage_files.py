@@ -1,3 +1,4 @@
+import os
 import subprocess
 import shlex
 
@@ -38,11 +39,15 @@ def build_coverage_files(tumor_bam=None, normal_bam=None, genome_path=None,
 
     cmd_template = "{bedtools_path} coverage -g {g} -d -sorted -a {target} -b {bam}"
 
-    for (bam, out_path) in [(tumor_bam, tumor_cov_path), (normal_bam, normal_cov_path)]:
-        print("Generating coverage for {}".format(bam))
-        with open(out_path, 'w') as out:
-            cmd = cmd_template.format(bedtools_path=bedtools_path, g=genome_path,
-                                      target=target_bed_path, bam=bam)
-            print("...bedtools command: {}".format(cmd))
-            proc = subprocess.Popen(shlex.split(cmd), stdin=subprocess.DEVNULL, stdout=out)
-            proc.communicate()
+    for (bam, out_path, which) in [(tumor_bam, tumor_cov_path, 'tumor'),
+                                   (normal_bam, normal_cov_path, 'normal')]:
+        if os.path.exists(out_path):
+            print("Coverage file for {} exists. Skipping.".format(which))
+        else:
+            print("Generating coverage for {}".format(bam))
+            with open(out_path, 'w') as out:
+                cmd = cmd_template.format(bedtools_path=bedtools_path, g=genome_path,
+                                          target=target_bed_path, bam=bam)
+                print("...bedtools command: {}".format(cmd))
+                proc = subprocess.Popen(shlex.split(cmd), stdin=subprocess.DEVNULL, stdout=out)
+                proc.communicate()
