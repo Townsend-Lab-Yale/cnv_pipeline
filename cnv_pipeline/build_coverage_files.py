@@ -43,6 +43,7 @@ def build_coverage_files(tumor_bam=None, normal_bam=None, genome_path=None,
                                    (normal_bam, normal_cov_path, 'normal')]:
         if os.path.exists(out_path):
             print("Coverage file for {} exists. Skipping.".format(which))
+            continue
         else:
             print("Generating coverage for {}".format(bam))
             with open(out_path, 'w') as out:
