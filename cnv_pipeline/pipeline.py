@@ -1,7 +1,9 @@
 import os
+import sys
 import shlex
 import subprocess
 import argparse
+import contextlib
 
 from cnv_pipeline.baf_from_vcf import baf_from_vcf
 from cnv_pipeline.build_coverage_files import build_genome_file, build_coverage_files
@@ -11,9 +13,9 @@ from cnv_pipeline.get_loh_intervals_adtex import finalize_loh
 
 def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_bam=None,
             baf_path=None, feather_path=None, tumor_cov_path=None, normal_cov_path=None,
-            col_normal=10, col_tumor=11,
+            col_normal=10, col_tumor=11, adtex_stdout=None,
             format_dp_index=5, mq_cutoff=30, chroms=None,
-            target_path=None, ploidy=2, min_read_depth=10):
+            target_path=None, ploidy=None, min_read_depth=10):
     """Run pipeline.
 
     At minimum, requires vcf_path and sample_dir (for storing output).
@@ -32,6 +34,8 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
         normal_cov_path = os.path.join(sample_dir, "normal_cov.bed")
     if adtex_dir is None:
         adtex_dir = os.path.join(sample_dir, 'adtex_output')
+    if adtex_stdout is None:
+        adtex_stdout = '-'  # write to stdout
     if chroms is None:
         chroms = '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,MT'
     if target_path is None:
@@ -58,13 +62,13 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
               baf_path=baf_path,
               target_path=target_path,
               ploidy=ploidy, min_read_depth=min_read_depth,
-              sample_dir=sample_dir)
+              stdout_path=adtex_stdout)
 
     finalize_loh(adtex_dir)
 
 
 def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_path=None, target_path=None,
-              stdout_path=None, ploidy=2, min_read_depth=10, sample_dir=None):
+              stdout_path=None, ploidy=None, min_read_depth=10):
     """ Example call from bash:
         python2 ADTEx_sgg.py --DOC \
         -n ${pdir}/cov_normal.bed \
@@ -74,7 +78,8 @@ def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_pat
         > ${pdir}/run_info.txt 2>&1
     """
     if stdout_path is None:
-        stdout_path = os.path.join(sample_dir, 'adtex_run_info.txt')
+        stdout_path = '-'  # will write to stdout
+    ploidy_str = '--ploidy {}'.format(ploidy) if ploidy is not None else ''
 
     config = load_config()
     python2_path = config.get('paths', 'PYTHON2', fallback='python2')
@@ -82,7 +87,7 @@ def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_pat
 
     cmd = ("{python2} {adtex_script} --DOC -n {normal_cov_path} -t {tumor_cov_path} "
            "-o {adtex_dir} --baf {baf_path} --bed {target_path} --estimatePloidy --plot "
-           "--ploidy {ploidy} --minReadDepth {mrd}")
+           "{ploidy_str} --minReadDepth {mrd}")
     cmd = cmd.format(python2=python2_path,
                      adtex_script=adtex_script,
                      normal_cov_path=normal_cov_path,
@@ -90,13 +95,28 @@ def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_pat
                      adtex_dir=adtex_dir,
                      baf_path=baf_path,
                      target_path=target_path,
-                     ploidy=ploidy, mrd=min_read_depth)
+                     ploidy_str=ploidy_str, mrd=min_read_depth)
     print("Running ADTEx with command:\n{}".format(cmd))
     args = shlex.split(cmd)
-    with open(stdout_path, 'w') as outfile:
+    with smart_open(stdout_path) as outfile:
         proc = subprocess.Popen(args, stdin=subprocess.DEVNULL, stdout=outfile, stderr=outfile)
         proc.communicate()
     print("ADTEx run complete")
+
+
+@contextlib.contextmanager
+def smart_open(filename=None):
+    """For opening file -OR- writing to stdout. via https://stackoverflow.com/a/17603000"""
+    if filename and filename != '-':
+        fh = open(filename, 'w')
+    else:
+        fh = sys.stdout
+
+    try:
+        yield fh
+    finally:
+        if fh is not sys.stdout:
+            fh.close()
 
 
 def main():
@@ -108,12 +128,14 @@ def main():
     parser.add_argument('-a', '--adtex_dir', help='ADTEx output dir', default=None)
     parser.add_argument('-ct', '--col_tumor', help='VCF column index for tumor, 1-based', type=int, default=10)
     parser.add_argument('-cn', '--col_normal', help='VCF column index for tumor, 1-based', type=int, default=11)
-    parser.add_argument("--ploidy", help="Most common ploidy in the tumour sample [2]", type=int, default=2)
+    parser.add_argument("--ploidy", help="Most common ploidy in the tumour sample", type=int, default=None)
     parser.add_argument("--minReadDepth", help="The threshold for minimum read depth for each exon [10]",
                         type=int, default=10)
+    parser.add_argument('-ao', '--adtex_stdout', help='ADTEx stdout path', default='-')
 
     args = parser.parse_args()
     run_cnv(vcf_path=args.vcf, sample_dir=args.sample_dir, adtex_dir=args.adtex_dir,
             tumor_bam=args.tumor, normal_bam=args.normal,
             col_tumor=args.col_tumor, col_normal=args.col_normal,
-            ploidy=args.ploidy, min_read_depth=args.minReadDepth)
+            ploidy=args.ploidy, min_read_depth=args.minReadDepth,
+            adtex_stdout=args.adtex_stdout)
