@@ -59,7 +59,7 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
     run_adtex(normal_cov_path=normal_cov_path,
               tumor_cov_path=tumor_cov_path,
               adtex_dir=adtex_dir,
-              baf_path=baf_path,
+              baf_path=feather_path,
               target_path=target_path,
               ploidy=ploidy, min_read_depth=min_read_depth,
               stdout_path=adtex_stdout)
