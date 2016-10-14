@@ -39,5 +39,4 @@ NGS.CNV_mod(seq.data=seq_data, output.dir=output.dir, sample.id=sample_id,
         do.cnvcall.on.merge=TRUE,
         cnvcall.pvalue.cutoff=cnvcall.pvalue.cutoff,
         do.plot=TRUE, cex=0.3, ref.num.probe=1000,
-	do.gene.anno=FALSE, seed=123456789,
-	verbose=TRUE)
+        seed=123456789, verbose=TRUE)
