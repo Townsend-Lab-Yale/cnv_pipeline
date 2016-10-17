@@ -17,7 +17,7 @@ def get_vcf_properties(vcf_path, tumor_id=None, normal_id=None):
                 skip += 1
             else:
                 break
-    df = pd.read_csv('try3/trimmed.vcf', sep='\t', skiprows=skip, nrows=100)
+    df = pd.read_csv(vcf_path, sep='\t', skiprows=skip, nrows=100)
     col_tumor = list(df.columns).index(tumor_id) + 1  # 1-based
     col_normal = list(df.columns).index(normal_id) + 1  # 1-based
     # get 'AD' location
