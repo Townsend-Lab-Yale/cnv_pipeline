@@ -155,4 +155,4 @@ def main():
             tumor_bam=args.tumor, normal_bam=args.normal,
             tumor_id=args.tumor_id, normal_id=args.normal_id,
             ploidy=args.ploidy, min_read_depth=args.minReadDepth,
-            adtex_stdout=args.adtex_stdout)
+            adtex_stdout=args.adtex_stdout, sample_id=args.tumor_id)
