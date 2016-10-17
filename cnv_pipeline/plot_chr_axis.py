@@ -46,7 +46,10 @@ class GenomeInfo():
         self.lines = [((x, 0), (x, 0.5)) for x in sizes.start]  # chromosome boundaries
 
     def get_genome_pos(self, chrom, pos):
-        return pos + self.start_dict[str(chrom)]
+        try:
+            return pos + self.start_dict[str(chrom)]
+        except:
+            return pd.np.nan
 
 
 def plot_chr_axis(chrom, pos, y, data=None, ax=None, figsize=None, use_Y=False, use_MT=False, 
@@ -65,7 +68,7 @@ def plot_chr_axis(chrom, pos, y, data=None, ax=None, figsize=None, use_Y=False, 
     if ax is None:
         hfig, ax = plt.subplots(1, figsize=figsize)
     d.plot(x='g_pos', y='y', kind='line', marker='.',
-        linewidth=0, alpha=alpha, markersize=markersize, ax=ax, legend=False, **dict_kw)
+           linewidth=0, alpha=alpha, markersize=markersize, ax=ax, legend=False, **dict_kw)
     ymin, ymax = ax.get_ylim() if ylim is None else ylim
     if format_axis:
         g.lines = [((x, ymin), (x, ymax)) for x in g.size_df.start]  # chromosome boundaries
@@ -80,13 +83,14 @@ def plot_chr_axis(chrom, pos, y, data=None, ax=None, figsize=None, use_Y=False, 
     return ax
 
 
-def plot_chr_intervals(ax, chrom, posA, posB, data=None, facecolor='r', alpha=0.1, ylim=None, **plot_kw):
+def plot_chr_intervals(ax, chrom, posA, posB, data=None, facecolor='r', alpha=0.1,
+                       ylim=None, use_Y=False, use_MT=False, **plot_kw):
     """Plot intervals on pre-existing genome axis."""
     if data is not None:
         chrom = data[chrom]
         posA = data[posA]
         posB = data[posB]
-    g = GenomeInfo()
+    g = GenomeInfo(use_Y=use_Y, use_MT=use_MT)
     d = pd.concat([pd.Series(chrom), pd.Series(posA), pd.Series(posB)], axis=1)  # position dataframe
     d.columns = ['chrom', 'posA', 'posB']
     d['g_posA'] = d.apply(lambda r: g.get_genome_pos(r.chrom, r.posA), axis=1)

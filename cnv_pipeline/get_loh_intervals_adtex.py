@@ -122,27 +122,32 @@ def trim_loh_intervals(z, loh_segs, out_dir=None, min_ratio=0.8):
     return loh_segs
 
 
-def plot_loh(loh, z, out_dir=None, yvar='tumor_BAF'):
+def plot_loh(loh, z, out_dir=None, y_var='tumor_BAF'):
     """.
     Args:
-        yvar (str): 'tumor_BAF' or 'mirrored_BAF'
+        y_var (str): 'tumor_BAF' or 'mirrored_BAF'
     """
     print('Plotting LOH.')
     if out_dir is None:
         out_dir = os.getcwd()
+
+    use_Y = (z.chrom == 'Y').any()
+    use_MT = (z.chrom == 'MT').any()
 
     out_path = os.path.join(out_dir, 'LOH_plot.png')
 
     loh.pos_start = loh.pos_start + 1  # convert from BED format
     
     # Plot raw data using zygosity calls for colors
-    y_var = 'tumor_BAF' # alternatively 'mirrored_BAF'
-    ax = plot_chr_axis('chrom', 'SNP_loc', y_var, data=z[z.zygosity == 'LOH'], figsize=(19,3), color='r', ylim=(0,1))
-    plot_chr_axis('chrom', 'SNP_loc', y_var, data=z[z.zygosity == 'ASCNA'], color='g', format_axis=False, ax=ax)
-    plot_chr_axis('chrom', 'SNP_loc', y_var, data=z[z.zygosity == 'HET'], color='b', format_axis=False, ax=ax)
+    ax = plot_chr_axis('chrom', 'SNP_loc', y_var, data=z[z.zygosity == 'LOH'], figsize=(19,3),
+                       color='r', ylim=(0,1), use_Y=use_Y, use_MT=use_MT)
+    plot_chr_axis('chrom', 'SNP_loc', y_var, data=z[z.zygosity == 'ASCNA'],
+                  color='g', format_axis=False, ax=ax, use_Y=use_Y, use_MT=use_MT)
+    plot_chr_axis('chrom', 'SNP_loc', y_var, data=z[z.zygosity == 'HET'],
+                  color='b', format_axis=False, ax=ax, use_Y=use_Y, use_MT=use_MT)
 
     # Draw rectangles for intervals
-    plot_chr_intervals(ax, 'chrom', 'pos_start', 'pos_end', data=loh)
+    plot_chr_intervals(ax, 'chrom', 'pos_start', 'pos_end', data=loh, use_Y=use_Y, use_MT=use_MT)
 
     ax.set_xlabel('')
     ax.set_ylabel('Tumor BAF')
