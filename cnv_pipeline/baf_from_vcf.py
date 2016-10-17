@@ -49,7 +49,7 @@ def baf_from_vcf(vcf_path, baf_path, feather_path=None, tumor_id=None, normal_id
         print("BAF files exist. Skipping vcf conversion.")
         return
 
-    col_tumor, col_normal, index_ad = get_vcf_properties(vcf_path, tumor_id=None, normal_id=None)
+    col_tumor, col_normal, index_ad = get_vcf_properties(vcf_path, tumor_id=tumor_id, normal_id=normal_id)
 
     if not os.path.exists(feather_path):
         # RUN Rscript
