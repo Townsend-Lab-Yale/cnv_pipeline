@@ -44,13 +44,13 @@ def prep_loh_dataframes(proj_dir):
     # SAVE SNP BED FILE
     z_loh = z[z.zygosity == 'LOH']
     loh_snp_bed = pd.concat([z_loh.chrom, z_loh.SNP_loc - 1, z_loh.SNP_loc], axis=1)
-    loh_snp_bed.to_csv(os.path.join(proj_dir, snp_out), index=False, sep='\t', header=False)
+    loh_snp_bed.to_csv(snp_out, index=False, sep='\t', header=False)
     # SAVE CNV_INTERVAL BED FILE
     cnv = pd.read_csv(cnv_path, sep='\t', 
                       dtype={'chr': str})
     cnv.rename(columns={'chr': 'chrom'}, inplace=True)
     interval_bed = pd.concat([cnv.chrom, cnv.CNV_start - 1, cnv.CNV_end], axis=1).drop_duplicates()
-    interval_bed.to_csv(os.path.join(proj_dir, cnv_out), index=False, sep='\t', header=False)
+    interval_bed.to_csv(cnv_out, index=False, sep='\t', header=False)
 
     # BEDTOOLS INTERSECTION
     """intersectBed -b loh_snps.bed -a cnv_interval.bed -wa -u  > loh_intervals.bed;"""
