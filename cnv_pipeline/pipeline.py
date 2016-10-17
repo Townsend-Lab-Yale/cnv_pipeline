@@ -13,8 +13,8 @@ from cnv_pipeline.get_loh_intervals_adtex import finalize_loh
 
 def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_bam=None,
             baf_path=None, feather_path=None, tumor_cov_path=None, normal_cov_path=None,
-            col_normal=10, col_tumor=11, adtex_stdout='-',
-            format_dp_index=5, mq_cutoff=30, chroms=None,
+            tumor_id=None, normal_id=None, adtex_stdout='-',
+            mq_cutoff=30, chroms=None,
             target_path=None, ploidy=None, min_read_depth=10, sample_id='Tumor'):
     """Run pipeline.
 
@@ -42,10 +42,12 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
     genome_path = os.path.join(sample_dir, "genome.txt")
     if not os.path.exists(sample_dir):
         os.mkdir(sample_dir)
+    if normal_id is None:
+        normal_id = tumor_id + 'N'
 
     baf_from_vcf(vcf_path, baf_path, feather_path=feather_path,
-                 col_tumor=col_tumor, col_normal=col_normal,
-                 format_dp_index=format_dp_index, mq_cutoff=mq_cutoff,
+                 tumor_id=tumor_id, normal_id=normal_id,
+                 format_ad_index=format_dp_index, mq_cutoff=mq_cutoff,
                  chroms=chroms)
 
     build_genome_file(sample_bam=normal_bam, genome_path=genome_path)
@@ -142,9 +144,8 @@ def main():
     parser.add_argument('-t', '--tumor', help='Tumor BAM [REQUIRED]', required=True)
     parser.add_argument('-n', '--normal', help='Normal BAM [REQUIRED]', required=True)
     parser.add_argument('-a', '--adtex_dir', help='ADTEx output dir', default=None)
-    parser.add_argument('-ct', '--col_tumor', help='VCF column index for tumor, 1-based', type=int, default=10)
-    parser.add_argument('-cn', '--col_normal', help='VCF column index for tumor, 1-based', type=int, default=11)
-    parser.add_argument('-id', '--sample_id', help='Sample name, for plot title', default='Tumor')
+    parser.add_argument('-tid', '--tumor_id', help='Tumor name, for vcf extraction', required=True)
+    parser.add_argument('-nid', '--normal_id', help='Normal name, for vcf extraction', default=None)
     parser.add_argument("--ploidy", help="Most common ploidy in the tumour sample", type=int, default=None)
     parser.add_argument("--minReadDepth", help="The threshold for minimum read depth for each exon [10]",
                         type=int, default=10)
@@ -153,6 +154,6 @@ def main():
     args = parser.parse_args()
     run_cnv(vcf_path=args.vcf, sample_dir=args.sample_dir, adtex_dir=args.adtex_dir,
             tumor_bam=args.tumor, normal_bam=args.normal,
-            col_tumor=args.col_tumor, col_normal=args.col_normal,
+            tumor_id=args.tumor_id, normal_id=args.normal_id,
             ploidy=args.ploidy, min_read_depth=args.minReadDepth,
             adtex_stdout=args.adtex_stdout)

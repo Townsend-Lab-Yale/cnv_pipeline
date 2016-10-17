@@ -5,9 +5,9 @@ library(feather)
 options <- commandArgs(trailingOnly = T)
 vcf_path <- options[1]  # input vcf path
 out_feather <- options[2]  # output filename
-tumor.col <- as.numeric(options[3])  # e.g. 11
-normal.col <- as.numeric(options[4])  # e.g. 10
-format.depth.indx <- as.numeric(options[5])  # e.g. 5
+tumor.col <- as.numeric(options[3])  # e.g. 10
+normal.col <- as.numeric(options[4])  # e.g. 11
+format.ad.indx <- as.numeric(options[5])  # e.g. 2
 if (length(args) > 5) {
     chroms <- unlist(strsplit(options[6],","))
     } else {
@@ -20,8 +20,8 @@ if (length(args) > 6) {
 }
 
 
-vcf2txt_sgg <- function (vcf.file, normal.col=10, tumor.col=11, MQ.cutoff=30,
-    format.depth.indx=5, format.gt.indx=1, chrs=c(1:22, "X", "Y"))
+vcf2txt_sgg <- function (vcf.file, normal.col=11, tumor.col=10, MQ.cutoff=30,
+    format.ad.indx=2, format.gt.indx=1, chrs=c(1:22, "X", "Y"))
 {
   
   inputFile <- file(vcf.file, "r")
@@ -46,13 +46,13 @@ vcf2txt_sgg <- function (vcf.file, normal.col=10, tumor.col=11, MQ.cutoff=30,
   normal.RD <- strsplit(vcf$Normal, ":")
   normal.RD <- do.call(rbind, normal.RD)
   vcf$Normal.GT <- normal.RD[, format.gt.indx]
-  normal.AD <- do.call(rbind, strsplit(normal.RD[, format.depth.indx], ","))  # SGG: orig indx 2
+  normal.AD <- do.call(rbind, strsplit(normal.RD[, format.ad.indx], ","))  # SGG: orig indx 2
   vcf$Normal.REF.DP <- as.integer(normal.AD[, 1])
   vcf$Normal.ALT.DP <- as.integer(normal.AD[, 2])
   tumor.RD <- strsplit(vcf$Tumor, ":")
   tumor.RD <- do.call(rbind, tumor.RD)
   vcf$Tumor.GT <- tumor.RD[, format.gt.indx]
-  tumor.AD <- do.call(rbind, strsplit(tumor.RD[, format.depth.indx], ","))
+  tumor.AD <- do.call(rbind, strsplit(tumor.RD[, format.ad.indx], ","))
   vcf$Tumor.REF.DP <- as.integer(tumor.AD[, 1])
   vcf$Tumor.ALT.DP <- as.integer(tumor.AD[, 2])
   vcf <- vcf[, c("CHROM", "POS", "ID", "REF", "ALT", "QUAL", 
@@ -81,12 +81,12 @@ vcf2txt_sgg <- function (vcf.file, normal.col=10, tumor.col=11, MQ.cutoff=30,
   return(vcf)
 }
 
-chrs=c(1:22, "X", "Y")
+#chrs=c(1:22, "X", "Y")
 
 # BUILD DATA TABLE
 vcf_table <- vcf2txt_sgg(vcf_path, normal.col=normal.col, tumor.col=tumor.col,
-    format.depth.indx=format.depth.indx, format.gt.indx=1, MQ.cutoff=MQ.cutoff,
-    chrs=chrs)
+    format.ad.indx=format.ad.indx, format.gt.indx=1, MQ.cutoff=MQ.cutoff,
+    chrs=chroms)
 
 # STRIP OUT ROWS WITH '.' GENOTYPE
 vcf_table <- vcf_table[(vcf_table$Normal.GT!='.') & (vcf_table$Tumor.GT!='.'),]

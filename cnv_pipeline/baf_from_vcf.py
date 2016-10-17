@@ -1,21 +1,42 @@
 import os
 import subprocess
 
+import pandas as pd
 import feather
 # import pandas as pd
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
 
-def baf_from_vcf(vcf_path, baf_path, feather_path=None, col_tumor=11, col_normal=10,
-                 format_dp_index=5, mq_cutoff=30,
+def get_vcf_properties(vcf_path, tumor_id=None, normal_id=None):
+    """Locate tumor and normal columns. Identify AD index within FORMAT."""
+    skip = 0
+    with open(vcf_path, 'r') as file:
+        for line in file:
+            if line.startswith('##'):
+                skip += 1
+            else:
+                break
+    df = pd.read_csv('try3/trimmed.vcf', sep='\t', skiprows=skip, nrows=100)
+    col_tumor = list(df.columns).index(tumor_id) + 1  # 1-based
+    col_normal = list(df.columns).index(normal_id) + 1  # 1-based
+    # get 'AD' location
+    index_ad = df.FORMAT.str.split(':').apply(lambda l: l.index('AD')).unique()
+    if len(index_ad) > 1:
+        raise Exception('Multiple AD locations within format string')
+    index_ad = index_ad[0] + 1  # 1-based
+    return col_tumor, col_normal, index_ad
+
+
+def baf_from_vcf(vcf_path, baf_path, feather_path=None, tumor_id=None, normal_id=None,
+                 mq_cutoff=30,
                  chroms='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,MT'):
     """
     Args:
         patient_id (str): used for saving saasCNV-style snp data to feather.
         vcf_path (str): full or relative vcf path
         col_{tumor,normal} (int): index of {tumor,normal} column in vcf. 1-based.
-        format_dp_index (int): index of DP in vcf FORMAT column. 1-based.
+        format_ad_index (int): index of AD in vcf FORMAT column. 1-based.
         MQ_cutoff (int): cutoff for MQ, in INFO column.
 
     Intermediate files:
@@ -28,13 +49,15 @@ def baf_from_vcf(vcf_path, baf_path, feather_path=None, col_tumor=11, col_normal
         print("BAF files exist. Skipping vcf conversion.")
         return
 
+    col_tumor, col_normal, index_ad = get_vcf_properties(vcf_path, tumor_id=None, normal_id=None)
+
     if not os.path.exists(feather_path):
         # RUN Rscript
         print("Running vcf to baf conversion R script.")
         rscript_path = os.path.join(script_dir, 'vcf2table.R')
         # R: Parse vcf, write data to feather
         subprocess.check_call(['Rscript', rscript_path, vcf_path, feather_path,
-                               str(col_tumor), str(col_normal), str(format_dp_index), chroms, str(mq_cutoff)])
+                               str(col_tumor), str(col_normal), str(index_ad), chroms, str(mq_cutoff)])
     else:
         print("Loading pre-existing baf feather file ({}).".format(feather_path))
     # Import results
