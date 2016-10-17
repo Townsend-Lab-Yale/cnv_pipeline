@@ -19,8 +19,8 @@ def get_vcf_properties(vcf_path, tumor_id=None, normal_id=None):
             else:
                 break
     df = pd.read_csv(vcf_path, sep='\t', skiprows=skip, nrows=100)
-    col_tumor = list(df.columns).index(tumor_id) + 1  # 1-based
-    col_normal = list(df.columns).index(normal_id) + 1  # 1-based
+    col_tumor = list(df.columns).index(tumor_id)  # 0-based
+    col_normal = list(df.columns).index(normal_id)  # 0-based
     # get 'AD' location
     # index_ad = df.FORMAT.str.split(':').apply(lambda l: l.index('AD')).unique()
     # if len(index_ad) > 1:
