@@ -47,8 +47,7 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
 
     baf_from_vcf(vcf_path, baf_path, feather_path=feather_path,
                  tumor_id=tumor_id, normal_id=normal_id,
-                 format_ad_index=format_dp_index, mq_cutoff=mq_cutoff,
-                 chroms=chroms)
+                 mq_cutoff=mq_cutoff, chroms=chroms)
 
     build_genome_file(sample_bam=normal_bam, genome_path=genome_path)
 
