@@ -29,7 +29,5 @@ def trim_vcf(vcf_in=None, tumor_id=None, normal_id=None,
                      min_depth_n=min_depth_n, min_depth_t=min_depth_t)
     print("VCF trim command: {}".format(cmd))
     with open(vcf_out, 'w') as new_vcf:
-        with open(subprocess.DEVNULL, 'r') as stdin:
-            proc = subprocess.Popen(shlex.split(cmd), stdin=stdin, stdout=new_vcf)
-    proc.communicate()
+        subprocess.check_call(shlex.split(cmd), stdout=new_vcf)
     print("Created vcf: {}".format(vcf_out))
