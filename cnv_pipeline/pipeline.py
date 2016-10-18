@@ -5,10 +5,10 @@ import subprocess
 import argparse
 import contextlib
 
-from cnv_pipeline.baf_from_vcf import baf_from_vcf
-from cnv_pipeline.build_coverage_files import build_genome_file, build_coverage_files
-from cnv_pipeline.config import load_config, this_dir
-from cnv_pipeline.get_loh_intervals_adtex import finalize_loh
+from .baf_from_vcf import baf_from_vcf
+from .build_coverage_files import build_genome_file, build_coverage_files
+from .config import load_config, this_dir
+from .get_loh_intervals_adtex import finalize_loh
 
 
 def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_bam=None,
@@ -137,6 +137,9 @@ def smart_open(filename=None):
 
 
 def main():
+    if __name__ == "__main__" and __package__ is None:
+        __package__ = "expected.package.name"
+
     parser = argparse.ArgumentParser("CNV PIPELINE")
     parser.add_argument('-v', '--vcf', help='VCF file for sample pair [REQUIRED]')
     parser.add_argument('-s', '--sample_dir', help='Sample-specific intermediate output dir [OPTIONAL]', required=True)

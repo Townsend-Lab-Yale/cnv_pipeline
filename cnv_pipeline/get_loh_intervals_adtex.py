@@ -6,7 +6,7 @@ import subprocess
 
 import pandas as pd
 
-from cnv_pipeline.plot_chr_axis import plot_chr_axis, plot_chr_intervals
+from .plot_chr_axis import plot_chr_axis, plot_chr_intervals
 
 chroms = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
           '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT']

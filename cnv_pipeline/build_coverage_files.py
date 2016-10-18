@@ -2,7 +2,7 @@ import os
 import subprocess
 import shlex
 
-from cnv_pipeline.config import load_config
+from .config import load_config
 
 
 def build_genome_file(sample_bam=None, genome_path=None):

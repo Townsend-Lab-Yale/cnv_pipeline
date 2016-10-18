@@ -2,7 +2,7 @@ import os
 import subprocess
 import shlex
 
-from cnv_pipeline.config import load_config
+from .config import load_config
 
 
 def trim_vcf(vcf_in=None, tumor_id=None, normal_id=None,
@@ -27,9 +27,9 @@ def trim_vcf(vcf_in=None, tumor_id=None, normal_id=None,
     cmd = cmd.format(gatk=gatk, vcf=vcf_in, fasta=fasta, normal=normal_id, tumor=tumor_id,
                      gq=min_gq_n, min_ratio=min_ratio, max_ratio=max_ratio,
                      min_depth_n=min_depth_n, min_depth_t=min_depth_t)
-    print("VCF trim command: {}").format(cmd)
+    print("VCF trim command: {}".format(cmd))
     with open(vcf_out, 'w') as new_vcf:
         with open(subprocess.DEVNULL, 'r') as stdin:
             proc = subprocess.Popen(shlex.split(cmd), stdin=stdin, stdout=new_vcf)
     proc.communicate()
-    print("Created vcf: {}").format(vcf_out)
+    print("Created vcf: {}".format(vcf_out))
