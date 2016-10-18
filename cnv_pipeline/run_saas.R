@@ -8,17 +8,10 @@ use.null.data <- as.logical(options[6])
 merge.pvalue.cutoff <- as.numeric(options[7])
 cnvcall.pvalue.cutoff <- as.numeric(options[8])
 
-
-# dirname = paste0('saas_minsnps',min.snps, '_chpts', max.chpts, '_null', use.null.data, '_mergep', merge.pvalue.cutoff, '_callp', cnvcall.pvalue.cutoff)
 dirname = 'saasCNV_results'
-# outputLoc = options[2]
-# thresh = as.numeric(options[3])
-# chrom = unlist(strsplit(options[5],","))
 
 library(feather)
 setwd(sample_dir)
-# vcf_feather <- paste0(sample_id, '_bac.feather')  # BAF feather path
-# seq_path <- 'seq.feather'  # BAF feather path
 vcf.data <- read_feather(seq_path)
 vcf.data$CHROM <- paste0('chr', vcf.data$CHROM)  # Add chr to chrom column
 

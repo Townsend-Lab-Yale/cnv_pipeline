@@ -11,6 +11,7 @@ from .config import load_config, this_dir
 from .get_loh_intervals_adtex import finalize_loh
 from .trim_vcf import trim_vcf
 
+
 def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_bam=None,
             baf_path=None, feather_path=None, tumor_cov_path=None, normal_cov_path=None,
             tumor_id=None, normal_id=None, adtex_stdout='-',
@@ -145,7 +146,7 @@ def smart_open(filename=None):
 
 def main():
     if __name__ == "__main__" and __package__ is None:
-        __package__ = "expected.package.name"
+        __package__ = "cnv_pipeline"
 
     parser = argparse.ArgumentParser("CNV PIPELINE")
     parser.add_argument('-v', '--vcf', help='VCF file for sample pair [REQUIRED]')
