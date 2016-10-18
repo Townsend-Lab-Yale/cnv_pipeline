@@ -9,13 +9,14 @@ from .baf_from_vcf import baf_from_vcf
 from .build_coverage_files import build_genome_file, build_coverage_files
 from .config import load_config, this_dir
 from .get_loh_intervals_adtex import finalize_loh
-
+from .trim_vcf import trim_vcf
 
 def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_bam=None,
             baf_path=None, feather_path=None, tumor_cov_path=None, normal_cov_path=None,
             tumor_id=None, normal_id=None, adtex_stdout='-',
-            mq_cutoff=30, chroms=None,
-            target_path=None, ploidy=None, min_read_depth=10, sample_id='Tumor'):
+            mq_cutoff=30, chroms=None, vcf_out=None,
+            target_path=None, ploidy=None, min_read_depth=10, sample_id='Tumor',
+            ratio_min=0.4, ratio_max=0.6, min_tumor=20, min_normal=10, min_gq=90):
     """Run pipeline.
 
     At minimum, requires vcf_path and sample_dir (for storing output).
@@ -39,13 +40,19 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
     if target_path is None:
         config = load_config()
         target_path = config.get('paths', 'CODING_REGIONS')
+    if vcf_out is None:
+        vcf_out = os.path.join(sample_dir, "snps_trimmed.vcf")
     genome_path = os.path.join(sample_dir, "genome.txt")
     if not os.path.exists(sample_dir):
         os.mkdir(sample_dir)
     if normal_id is None:
         normal_id = tumor_id + 'N'
 
-    baf_from_vcf(vcf_path, baf_path, feather_path=feather_path,
+    trim_vcf(vcf_in=vcf_path, tumor_id=tumor_id, normal_id=normal_id,
+             ratio_min=0.4, ratio_max=0.6, min_depth_n=min_normal,
+             min_depth_t=min_tumor, min_gq_n=min_gq, vcf_out=vcf_out)
+
+    baf_from_vcf(vcf_out, baf_path, feather_path=feather_path,
                  tumor_id=tumor_id, normal_id=normal_id,
                  mq_cutoff=mq_cutoff, chroms=chroms)
 
@@ -148,14 +155,22 @@ def main():
     parser.add_argument('-a', '--adtex_dir', help='ADTEx output dir', default=None)
     parser.add_argument('-tid', '--tumor_id', help='Tumor name, for vcf extraction', required=True)
     parser.add_argument('-nid', '--normal_id', help='Normal name, for vcf extraction', default=None)
+    parser.add_argument('-rmin', '--ratio_min', help='Min alt ratio in normal sample [0.4]', type=float, default=0.4)
+    parser.add_argument('-rmax', '--ratio_max', help='Max alt ratio in normal sample [0.4]', type=float, default=0.4)
+    parser.add_argument('-tmin', '--min_tumor', help='Min reads from tumor sample [20]', type=int, default=20)
+    parser.add_argument('-nmin', '--min_normal', help='Min reads from normal sample [10]', type=int, default=10)
+    parser.add_argument('-gq', '--min_gq', help='Genotype quality cutoff for normal sample [90]', type=int, default=90)
     parser.add_argument("--ploidy", help="Most common ploidy in the tumour sample", type=int, default=None)
     parser.add_argument("--minReadDepth", help="The threshold for minimum read depth for each exon [10]",
                         type=int, default=10)
     parser.add_argument('-ao', '--adtex_stdout', help='ADTEx stdout path', default='-')
 
     args = parser.parse_args()
+    vcf_dict = dict(ratio_min=args.ratio_min, ratio_max=args.ratio_max,
+                    min_tumor=args.min_tumor, min_normal=args.min_normal,
+                    min_gq=args.min_gq)
     run_cnv(vcf_path=args.vcf, sample_dir=args.sample_dir, adtex_dir=args.adtex_dir,
             tumor_bam=args.tumor, normal_bam=args.normal,
             tumor_id=args.tumor_id, normal_id=args.normal_id,
             ploidy=args.ploidy, min_read_depth=args.minReadDepth,
-            adtex_stdout=args.adtex_stdout, sample_id=args.tumor_id)
+            adtex_stdout=args.adtex_stdout, sample_id=args.tumor_id, **vcf_dict)
