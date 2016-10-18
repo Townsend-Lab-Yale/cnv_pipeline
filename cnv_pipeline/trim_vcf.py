@@ -25,7 +25,7 @@ def trim_vcf(vcf_in=None, tumor_id=None, normal_id=None,
         """&& vc.getGenotype("{normal}").getDP() > {min_depth_n} """
         """&& vc.getGenotype("{tumor}").getDP() > {min_depth_t}'""")
     cmd = cmd.format(gatk=gatk, vcf=vcf_in, fasta=fasta, normal=normal_id, tumor=tumor_id,
-                     gq=min_gq_n, min_ratio=ratio_min, max_ratio=ratio_max,
+                     gq=min_gq_n, ratio_min=ratio_min, ratio_max=ratio_max,
                      min_depth_n=min_depth_n, min_depth_t=min_depth_t)
     print("VCF trim command: {}".format(cmd))
     with open(vcf_out, 'w') as new_vcf:

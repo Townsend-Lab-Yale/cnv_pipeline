@@ -49,7 +49,7 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
         normal_id = tumor_id + 'N'
 
     trim_vcf(vcf_in=vcf_path, tumor_id=tumor_id, normal_id=normal_id,
-             ratio_min=0.4, ratio_max=0.6, min_depth_n=min_normal,
+             ratio_min=ratio_min, ratio_max=ratio_max, min_depth_n=min_normal,
              min_depth_t=min_tumor, min_gq_n=min_gq, vcf_out=vcf_out)
 
     baf_from_vcf(vcf_out, baf_path, feather_path=feather_path,
