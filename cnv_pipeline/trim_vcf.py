@@ -21,12 +21,12 @@ def trim_vcf(vcf_in=None, tumor_id=None, normal_id=None,
         """-selectType SNP --restrictAllelesTo BIALLELIC -select 'vc.getGenotype("{normal}").isHet() """
         """&& vc.getGenotype("{normal}").getGQ() > {gq} """
         """&& 1.0 * vc.getGenotype("{normal}").getAD().1 /  vc.getGenotype("{normal}").getDP() > {ratio_min} """
-        """&&  1.0 * vc.getGenotype("{normal}").getAD().1 /  vc.getGenotype("{normal}").getDP() < {ratio_max} """
+        """&& 1.0 * vc.getGenotype("{normal}").getAD().1 /  vc.getGenotype("{normal}").getDP() < {ratio_max} """
         """&& vc.getGenotype("{normal}").getDP() > {min_depth_n} """
         """&& vc.getGenotype("{tumor}").getDP() > {min_depth_t}'""")
     cmd = cmd.format(gatk=gatk, vcf=vcf_in, fasta=fasta, normal=normal_id, tumor=tumor_id,
                      gq=min_gq_n, ratio_min=ratio_min, ratio_max=ratio_max,
-                     min_depth_n=min_depth_n, min_depth_t=min_depth_t)
+                     min_depth_n=min_depth_n-1, min_depth_t=min_depth_t-1)
     print("VCF trim command: {}".format(cmd))
     with open(vcf_out, 'w') as new_vcf:
         subprocess.check_call(shlex.split(cmd), stdout=new_vcf)

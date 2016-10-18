@@ -156,7 +156,7 @@ def main():
     parser.add_argument('-tid', '--tumor_id', help='Tumor name, for vcf extraction', required=True)
     parser.add_argument('-nid', '--normal_id', help='Normal name, for vcf extraction', default=None)
     parser.add_argument('-rmin', '--ratio_min', help='Min alt ratio in normal sample [0.4]', type=float, default=0.4)
-    parser.add_argument('-rmax', '--ratio_max', help='Max alt ratio in normal sample [0.4]', type=float, default=0.4)
+    parser.add_argument('-rmax', '--ratio_max', help='Max alt ratio in normal sample [0.6]', type=float, default=0.6)
     parser.add_argument('-tmin', '--min_tumor', help='Min reads from tumor sample [20]', type=int, default=20)
     parser.add_argument('-nmin', '--min_normal', help='Min reads from normal sample [10]', type=int, default=10)
     parser.add_argument('-gq', '--min_gq', help='Genotype quality cutoff for normal sample [90]', type=int, default=90)
