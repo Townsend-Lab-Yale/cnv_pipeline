@@ -95,8 +95,9 @@ def plot_chr_intervals(ax, chrom, posA, posB, data=None, facecolor='r', alpha=0.
     d.columns = ['chrom', 'posA', 'posB']
     d['g_posA'] = d.apply(lambda r: g.get_genome_pos(r.chrom, r.posA), axis=1)
     d['width'] = d.posB - d.posA + 1
-    ymin, ymax = ax.get_ylim()
+    ybottom, ytop = ax.get_ylim()
+    yd = abs(ybottom - ytop)
     for ind, seg in d.iterrows():
         xs = seg.g_posA
         xd = seg.width
-        ax.add_patch(patches.Rectangle((xs, ymin), xd, ymax, alpha=alpha, facecolor=facecolor, edgecolor='none'))
+        ax.add_patch(patches.Rectangle((xs, ybottom), xd, yd, alpha=alpha, facecolor=facecolor, edgecolor='none'))
