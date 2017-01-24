@@ -123,9 +123,12 @@ def trim_loh_intervals(z, loh_segs, out_dir=None, min_ratio=0.8):
 
 
 def plot_loh(loh, z, out_dir=None, y_var='tumor_BAF'):
-    """.
+    """Plot ADTEx zygosity calls for filtered SNPs with boxes for LOH regions.
     Args:
-        y_var (str): 'tumor_BAF' or 'mirrored_BAF'
+        loh (df): stripped loh segs. start pos is 0-based.
+        z (pd.DataFrame): raw zygosity dataframe, from ADTEx.
+        out_dir (str): [optional] directory in which to save plot.
+        y_var (str): z column name for y axis data.
     """
     print('Plotting LOH.')
     if out_dir is None:
@@ -136,18 +139,35 @@ def plot_loh(loh, z, out_dir=None, y_var='tumor_BAF'):
 
     out_path = os.path.join(out_dir, 'LOH_plot.png')
 
-    loh.pos_start = loh.pos_start + 1  # convert from BED format
-    
+    loh.pos_start += 1  # convert from BED format
+
     # Plot raw data using zygosity calls for colors
-    ax = plot_chr_axis('chrom', 'SNP_loc', y_var, data=z[z.zygosity == 'LOH'], figsize=(19,3),
-                       color='r', ylim=(0,1), use_Y=use_Y, use_MT=use_MT)
-    plot_chr_axis('chrom', 'SNP_loc', y_var, data=z[z.zygosity == 'ASCNA'],
-                  color='g', format_axis=False, ax=ax, use_Y=use_Y, use_MT=use_MT)
-    plot_chr_axis('chrom', 'SNP_loc', y_var, data=z[z.zygosity == 'HET'],
-                  color='b', format_axis=False, ax=ax, use_Y=use_Y, use_MT=use_MT)
+    ax = None
+    arg_dict = dict(figsize=(19, 3), ylim=(0, 1), use_Y=use_Y, use_MT=use_MT)
+    update_dict = dict(format_axis=False, use_Y=use_Y, use_MT=use_MT)
+
+    if sum(z.zygosity == 'LOH'):
+        ax = plot_chr_axis('chrom', 'SNP_loc', y_var,
+                           data=z[z.zygosity == 'LOH'],
+                           color='r', **arg_dict)
+        update_dict['ax'] = ax
+        arg_dict = update_dict
+
+    if sum(z.zygosity == 'ASCNA'):
+        ax = plot_chr_axis('chrom', 'SNP_loc', y_var,
+                           data=z[z.zygosity == 'ASCNA'],
+                           color='g', **arg_dict)
+        update_dict['ax'] = ax
+        arg_dict = update_dict
+
+    if sum(z.zygosity == 'HET'):
+        ax = plot_chr_axis('chrom', 'SNP_loc', y_var,
+                           data=z[z.zygosity == 'HET'],
+                           color='b', **arg_dict)
 
     # Draw rectangles for intervals
-    plot_chr_intervals(ax, 'chrom', 'pos_start', 'pos_end', data=loh, use_Y=use_Y, use_MT=use_MT)
+    if len(loh):
+        plot_chr_intervals(ax, 'chrom', 'pos_start', 'pos_end', data=loh, use_Y=use_Y, use_MT=use_MT)
 
     ax.set_xlabel('')
     ax.set_ylabel('Tumor BAF')
