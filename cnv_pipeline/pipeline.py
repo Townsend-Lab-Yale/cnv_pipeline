@@ -14,7 +14,7 @@ from .trim_vcf import trim_vcf
 
 def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_bam=None,
             baf_path=None, feather_path=None, tumor_cov_path=None, normal_cov_path=None,
-            tumor_id=None, normal_id=None, adtex_stdout='-',
+            tumor_id=None, normal_id=None, saas_only=False, adtex_stdout='-',
             mq_cutoff=30, chroms=None, vcf_out=None,
             target_path=None, ploidy=None, min_read_depth=10, sample_id='Tumor',
             ratio_min=0.4, ratio_max=0.6, min_tumor=20, min_normal=10, min_gq=90):
@@ -57,23 +57,25 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
                  tumor_id=tumor_id, normal_id=normal_id,
                  mq_cutoff=mq_cutoff, chroms=chroms)
 
-    build_genome_file(sample_bam=normal_bam, genome_path=genome_path)
+    run_saasCNV(sample_id=sample_id, sample_dir=sample_dir,
+                baf_path=feather_path, stdout_path='-')
 
-    build_coverage_files(tumor_bam=tumor_bam, normal_bam=normal_bam, genome_path=genome_path,
-                         tumor_cov_path=tumor_cov_path, normal_cov_path=normal_cov_path,
-                         target_bed_path=target_path)
+    if not saas_only:
+        build_genome_file(sample_bam=normal_bam, genome_path=genome_path)
 
-    run_saasCNV(sample_id=sample_id, sample_dir=sample_dir, baf_path=feather_path, stdout_path='-')
+        build_coverage_files(tumor_bam=tumor_bam, normal_bam=normal_bam, genome_path=genome_path,
+                             tumor_cov_path=tumor_cov_path, normal_cov_path=normal_cov_path,
+                             target_bed_path=target_path)
 
-    run_adtex(normal_cov_path=normal_cov_path,
-              tumor_cov_path=tumor_cov_path,
-              adtex_dir=adtex_dir,
-              baf_path=baf_path,
-              target_path=target_path,
-              ploidy=ploidy, min_read_depth=min_read_depth,
-              stdout_path=adtex_stdout)
+        run_adtex(normal_cov_path=normal_cov_path,
+                  tumor_cov_path=tumor_cov_path,
+                  adtex_dir=adtex_dir,
+                  baf_path=baf_path,
+                  target_path=target_path,
+                  ploidy=ploidy, min_read_depth=min_read_depth,
+                  stdout_path=adtex_stdout)
 
-    finalize_loh(adtex_dir)
+        finalize_loh(adtex_dir)
 
 
 def run_saasCNV(sample_id=None, sample_dir=None, baf_path=None, stdout_path='-'):
@@ -153,6 +155,10 @@ def main():
     parser.add_argument('-s', '--sample_dir', help='Sample-specific intermediate output dir [OPTIONAL]', required=True)
     parser.add_argument('-t', '--tumor', help='Tumor BAM [REQUIRED]', required=True)
     parser.add_argument('-n', '--normal', help='Normal BAM [REQUIRED]', required=True)
+
+    parser.add_argument('--saas_only', help='Only run saasCNV, not ADTEx.',
+                        action='store_true', default=False)
+
     parser.add_argument('-a', '--adtex_dir', help='ADTEx output dir', default=None)
     parser.add_argument('-tid', '--tumor_id', help='Tumor name, for vcf extraction', required=True)
     parser.add_argument('-nid', '--normal_id', help='Normal name, for vcf extraction', default=None)
@@ -173,5 +179,6 @@ def main():
     run_cnv(vcf_path=args.vcf, sample_dir=args.sample_dir, adtex_dir=args.adtex_dir,
             tumor_bam=args.tumor, normal_bam=args.normal,
             tumor_id=args.tumor_id, normal_id=args.normal_id,
+            saas_only=args.saas_only,
             ploidy=args.ploidy, min_read_depth=args.minReadDepth,
             adtex_stdout=args.adtex_stdout, sample_id=args.tumor_id, **vcf_dict)
