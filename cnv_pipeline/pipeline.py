@@ -153,8 +153,8 @@ def main():
     parser = argparse.ArgumentParser("CNV PIPELINE")
     parser.add_argument('-v', '--vcf', help='VCF file for sample pair [REQUIRED]')
     parser.add_argument('-s', '--sample_dir', help='Sample-specific intermediate output dir [OPTIONAL]', required=True)
-    parser.add_argument('-t', '--tumor', help='Tumor BAM [REQUIRED]', required=True)
-    parser.add_argument('-n', '--normal', help='Normal BAM [REQUIRED]', required=True)
+    parser.add_argument('-t', '--tumor', help='Tumor BAM', required=False)
+    parser.add_argument('-n', '--normal', help='Normal BAM', required=False)
 
     parser.add_argument('--saas_only', help='Only run saasCNV, not ADTEx.',
                         action='store_true', default=False)
