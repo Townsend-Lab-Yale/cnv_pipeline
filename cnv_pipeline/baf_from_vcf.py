@@ -89,7 +89,7 @@ def baf_from_vcf(vcf_path, baf_path, feather_path=None, tumor_id=None, normal_id
     
     for col in DTYPE_DICT:
         df[col] = df[col].astype(DTYPE_DICT[col])
-    df.to_feather(feather_path)  # for saasCNV
+    df.reset_index(drop=True).to_feather(feather_path)  # for saasCNV
 
     # Finalize baf file
     print("Finalizing dataframe.")
