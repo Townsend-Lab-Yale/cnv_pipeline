@@ -2,7 +2,21 @@ import os
 import re
 
 import pandas as pd
-import feather
+
+
+DTYPE_DICT = {'ALT': str,
+ 'CHROM': str,
+ 'ID': str,
+ 'MQ': float,
+ 'Normal.ALT.DP': int,
+ 'Normal.GT': str,
+ 'Normal.REF.DP': int,
+ 'POS': int,
+ 'QUAL': float,
+ 'REF': str,
+ 'Tumor.ALT.DP': int,
+ 'Tumor.GT': str,
+ 'Tumor.REF.DP': int}
 
 
 def get_vcf_properties(vcf_path, tumor_id=None, normal_id=None):
@@ -72,7 +86,10 @@ def baf_from_vcf(vcf_path, baf_path, feather_path=None, tumor_id=None, normal_id
                 ["CHROM", "POS", "ID", "REF", "ALT", "QUAL", "MQ",
                  "Normal.GT", "Normal.REF.DP", "Normal.ALT.DP", "Tumor.GT",
                  "Tumor.REF.DP", "Tumor.ALT.DP"]].copy()
-    feather.write_dataframe(df, feather_path)  # for saasCNV
+    
+    for col in DTYPE_DICT:
+        df[col] = df[col].astype(DTYPE_DICT[col])
+    df.to_feather(feather_path)  # for saasCNV
 
     # Finalize baf file
     print("Finalizing dataframe.")
