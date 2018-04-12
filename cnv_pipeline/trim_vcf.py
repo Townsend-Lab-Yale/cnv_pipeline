@@ -33,7 +33,7 @@ def trim_vcf(vcf_in=None, tumor_id=None, normal_id=None,
     print("Created vcf: {}".format(vcf_out))
 
 
-def get_gatk_cmd(config=config):
+def get_gatk_cmd(config=None):
     """Perform environment variable replacement, if applicable."""
     gatk = config.get('gatk', 'cmd', fallback='gatk')
     if '$' in gatk:

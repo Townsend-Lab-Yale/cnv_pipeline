@@ -12,7 +12,7 @@ setup(name='cnv_pipeline',
       packages=['cnv_pipeline'],
       package_data={'cnv_pipeline': ['config.ini', '*.R']},
       install_requires=[
-          'pandas>=0.22',
+          'pandas>=0.22', 'matplotlib'
       ],
       entry_points={'console_scripts': ['run_cnv = cnv_pipeline.pipeline:main']},
       zip_safe=False,
