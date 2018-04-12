@@ -14,7 +14,7 @@ def trim_vcf(vcf_in=None, tumor_id=None, normal_id=None,
     if vcf_out is None:
         vcf_out = os.path.join(sample_dir, 'snps_trimmed.vcf')
     config = load_config()
-    gatk = config.get('gatk', 'cmd', fallback='gatk')
+    gatk = get_gatk_cmd(config=config)
     fasta = config.get('paths', 'FASTA')
     cmd = (
         """{gatk} -T SelectVariants -R {fasta} -V {vcf} -sn {normal} -sn {tumor} """
@@ -31,3 +31,11 @@ def trim_vcf(vcf_in=None, tumor_id=None, normal_id=None,
     with open(vcf_out, 'w') as new_vcf:
         subprocess.check_call(shlex.split(cmd), stdout=new_vcf)
     print("Created vcf: {}".format(vcf_out))
+
+
+def get_gatk_cmd(config=config):
+    """Perform environment variable replacement, if applicable."""
+    gatk = config.get('gatk', 'cmd', fallback='gatk')
+    if '$' in gatk:
+        gatk = os.path.expandvars(gatk)
+    return gatk
