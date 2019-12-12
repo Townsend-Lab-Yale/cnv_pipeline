@@ -31,6 +31,7 @@ def plot_case_cnv(case_id, tumor_ids=None, feather_dict=None, cnv_dict=None, dim
     hf, axs = plt.subplots(len(tumor_ids), 1, figsize=(14,10), sharex=True,
     #                        gridspec_kw={'height_ratios':[10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]},
                            subplot_kw=AX_DICT)
+    axs = [axs] if len(tumor_ids) == 1 else axs  # ensure axs is iterable.
     # for ax in axs:
     #     format_axis(ax, g)
 
