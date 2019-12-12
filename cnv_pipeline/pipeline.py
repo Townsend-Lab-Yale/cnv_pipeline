@@ -22,7 +22,7 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
 
     At minimum, requires vcf_path and sample_dir (for storing output).
 
-    Args:
+    Note:
         sample_dir (str): Must be sample specific to prevent file overwrite.
     """
 

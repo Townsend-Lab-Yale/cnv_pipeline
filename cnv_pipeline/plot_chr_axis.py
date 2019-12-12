@@ -8,7 +8,7 @@ from matplotlib import collections as mc
 import matplotlib.patches as patches
 
 
-class GenomeInfo():
+class GenomeInfo:
     """Loads basic genome attributes required for plotting genomic data."""
     def __init__(self, use_Y=False, use_MT=False):
         """Create attributes: size_df, genome_size, start_dict, lines."""

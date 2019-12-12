@@ -15,7 +15,7 @@ Install required R packages, including saasCNV.
 ```R
 source("https://bioconductor.org/biocLite.R")
 biocLite("DNAcopy")
-install.packages(“RANN”)
+install.packages("RANN")
 install.packages("saasCNV")
 install.packages("feather")
 ```

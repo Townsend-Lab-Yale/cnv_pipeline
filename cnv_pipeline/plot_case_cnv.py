@@ -1,5 +1,5 @@
 import os
-os.environ['QT_QPA_PLATFORM']='offscreen'
+os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
 import cnv_pipeline.plot_chr_axis as pcnv
 
