@@ -1,22 +1,25 @@
 import os
 import re
 
+import numpy as np
 import pandas as pd
 
 DTYPE_DICT = {'ALT': str,
- 'CHROM': str,
- 'ID': str,
- 'MQ': float,
- 'Normal.ALT.DP': int,
- 'Normal.GT': str,
- 'Normal.REF.DP': int,
- 'POS': int,
- 'QUAL': float,
- 'REF': str,
- 'Tumor.ALT.DP': int,
- 'Tumor.GT': str,
- 'Tumor.REF.DP': int}
+              'CHROM': str,
+              'ID': str,
+              'MQ': float,
+              'Normal.ALT.DP': int,
+              'Normal.GT': str,
+              'Normal.REF.DP': int,
+              'POS': int,
+              'QUAL': float,
+              'REF': str,
+              'Tumor.ALT.DP': int,
+              'Tumor.GT': str,
+              'Tumor.REF.DP': int,
+              }
 
+CHROMS_STR = '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,MT'
 
 def get_vcf_properties(vcf_path, tumor_id=None, normal_id=None):
     """Locate tumor and normal columns. Identify AD index within FORMAT."""
@@ -42,7 +45,7 @@ def get_mq(info):
     v = info.split(';')
     vals = [i for i in v if re.match('^MQ=[0-9\.]+$', i)]
     if len(vals) != 1:
-        return pd.np.nan
+        return np.nan
     mq = float(vals[0].split('=')[1])
     return mq
 
@@ -54,8 +57,8 @@ def parse_format(f, col_gt=0, col_ad=1):
     return vals[col_gt], int(n_ref), int(n_alt)
 
 
-def baf_from_vcf(vcf_path, baf_path, feather_path=None, tumor_id=None, normal_id=None,
-                 mq_cutoff=30, chroms='1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,MT'):
+def baf_from_vcf(vcf_path, baf_path, parquet_path=None, tumor_id=None, normal_id=None,
+                 mq_cutoff=30, chroms=CHROMS_STR) -> None:
     """Args:
         patient_id (str): used for saving saasCNV-style snp data to feather.
         vcf_path (str): full or relative vcf path
@@ -67,8 +70,8 @@ def baf_from_vcf(vcf_path, baf_path, feather_path=None, tumor_id=None, normal_id
         <baf_path>.feather: created by vcf2table.R
     """
     chrom_list = chroms.split(',')
-    if feather_path is None:
-        feather_path = baf_path + '.feather'
+    if parquet_path is None:
+        parquet_path = baf_path + '.parquet'
     v = get_vcf_properties(vcf_path=vcf_path, tumor_id=tumor_id,
                            normal_id=normal_id)
     col_tumor, col_normal, skip = v
@@ -77,10 +80,10 @@ def baf_from_vcf(vcf_path, baf_path, feather_path=None, tumor_id=None, normal_id
     df['MQ'] = df.INFO.apply(lambda info: get_mq(info))
     for col, names in [(col_tumor, ['Tumor.GT', 'Tumor.REF.DP', 'Tumor.ALT.DP']),
                        (col_normal, ['Normal.GT', 'Normal.REF.DP', 'Normal.ALT.DP'])]:
-        vals = df.ix[:, col].apply(lambda f: parse_format(f))
+        vals = df.iloc[:, col].apply(lambda f: parse_format(f))
         df[names[0]], df[names[1]], df[names[2]] = zip(*vals)
-        df[names[1]] = df[names[1]].astype(pd.np.int64)
-        df[names[2]] = df[names[2]].astype(pd.np.int64)
+        df[names[1]] = df[names[1]].astype(np.int64)
+        df[names[2]] = df[names[2]].astype(np.int64)
     df = df.loc[(df.MQ > mq_cutoff) & (df.CHROM.isin(chrom_list)),
                 ["CHROM", "POS", "ID", "REF", "ALT", "QUAL", "MQ",
                  "Normal.GT", "Normal.REF.DP", "Normal.ALT.DP", "Tumor.GT",
@@ -88,7 +91,7 @@ def baf_from_vcf(vcf_path, baf_path, feather_path=None, tumor_id=None, normal_id
 
     for col in DTYPE_DICT:
         df[col] = df[col].astype(DTYPE_DICT[col])
-    df.reset_index(drop=True).to_feather(feather_path)  # for saasCNV
+    df.reset_index(drop=True).to_parquet(parquet_path)  # for saasCNV
 
     # Finalize baf file
     print("Finalizing dataframe.")

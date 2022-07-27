@@ -1,8 +1,9 @@
-import pandas as pd
 import matplotlib
 
 matplotlib.use('Agg')
 
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import collections as mc
 import matplotlib.patches as patches
@@ -49,7 +50,7 @@ class GenomeInfo:
         try:
             return pos + self.start_dict[str(chrom)]
         except:
-            return pd.np.nan
+            return np.nan
 
 
 def plot_chr_axis(chrom, pos, y, data=None, ax=None, figsize=None, use_Y=False, use_MT=False, 

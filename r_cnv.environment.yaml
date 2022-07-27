@@ -1,0 +1,13 @@
+name: r_cnv
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - r-base
+  - bioconductor-dnacopy
+  - r-rann
+  - r-arrow
+  - r-wmtsa
+# Also need install.packages("saasCNV") within R
+# r-wmtsa needed for adtex, not saas-cnv

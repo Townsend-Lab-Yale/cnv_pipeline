@@ -13,7 +13,7 @@ from .trim_vcf import trim_vcf
 
 
 def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_bam=None,
-            baf_path=None, feather_path=None, tumor_cov_path=None, normal_cov_path=None,
+            baf_path=None, parquet_path=None, tumor_cov_path=None, normal_cov_path=None,
             tumor_id=None, normal_id=None, saas_only=False, adtex_stdout='-',
             mq_cutoff=30, chroms=None, vcf_out=None,
             target_path=None, ploidy=None, min_read_depth=10, sample_id='Tumor',
@@ -28,8 +28,8 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
 
     if baf_path is None:
         baf_path = os.path.join(sample_dir, "baf.txt")
-    if feather_path is None:
-        feather_path = os.path.join(sample_dir, "saas.feather")
+    if parquet_path is None:
+        parquet_path = os.path.join(sample_dir, "saas.parquet")
     if tumor_cov_path is None:
         tumor_cov_path = os.path.join(sample_dir, "tumor_cov.bed")
     if normal_cov_path is None:
@@ -53,12 +53,12 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
              ratio_min=ratio_min, ratio_max=ratio_max, min_depth_n=min_normal,
              min_depth_t=min_tumor, min_gq_n=min_gq, vcf_out=vcf_out)
 
-    baf_from_vcf(vcf_out, baf_path, feather_path=feather_path,
+    baf_from_vcf(vcf_out, baf_path, parquet_path=parquet_path,
                  tumor_id=tumor_id, normal_id=normal_id,
                  mq_cutoff=mq_cutoff, chroms=chroms)
 
     run_saasCNV(sample_id=sample_id, sample_dir=sample_dir,
-                baf_path=feather_path, stdout_path='-')
+                baf_path=parquet_path, stdout_path='-')
 
     if not saas_only:
         build_genome_file(sample_bam=normal_bam, genome_path=genome_path)
@@ -83,9 +83,12 @@ def run_saasCNV(sample_id=None, sample_dir=None, baf_path=None, stdout_path='-')
     Rscript run_saas.R {s_id} {sample_dir} {baf_path} 50 30 FALSE 0.05 0.05
     """
     script_path = os.path.join(this_dir, 'run_saas.R')
-    cmd = "Rscript {script_path} {s_id} {sample_dir} {baf_path} 50 30 FALSE 0.05 0.05"
-    cmd = cmd.format(script_path=script_path, s_id=sample_id,
-                     sample_dir=os.path.realpath(sample_dir), baf_path=os.path.realpath(baf_path))
+    config = load_config()
+    rscript_path = config.get('paths', 'RSCRIPT', fallback='Rscript')
+    sample_path = os.path.realpath(sample_dir)
+    baf_path = os.path.realpath(baf_path)
+    cmd = (f"{rscript_path} {script_path} {sample_id} {sample_path} {baf_path}"
+           " 50 30 FALSE 0.05 0.05")
     print("Running saasCNV with command:\n  {}".format(cmd))
     args = shlex.split(cmd)
     with smart_open(stdout_path) as outfile:

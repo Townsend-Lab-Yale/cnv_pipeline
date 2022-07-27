@@ -4,12 +4,14 @@ import os
 import shlex
 import subprocess
 
+import numpy as np
 import pandas as pd
 
 from .plot_chr_axis import plot_chr_axis, plot_chr_intervals
 
 chroms = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
-          '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT']
+          '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X',
+          'Y', 'MT']
 
 
 def finalize_loh(proj_dir):
@@ -103,7 +105,7 @@ def trim_loh_intervals(z, loh_segs, out_dir=None, min_ratio=0.8):
         seg_ratio = l_d / s_d if s_d != 0 else 0
         # delete seg if only one LOH point
         if l_a.name == l_b.name:
-            loh_segs.loc[seg.name, ['pos_start', 'pos_end']] = (pd.np.nan, pd.np.nan)
+            loh_segs.loc[seg.name, ['pos_start', 'pos_end']] = (np.nan, np.nan)
             continue  # !!!
         # update seg if smaller than ratio
         if seg_ratio < min_ratio:

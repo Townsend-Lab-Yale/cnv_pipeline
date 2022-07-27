@@ -24,7 +24,8 @@ Install [ADTEx](https://sourceforge.net/projects/adtex/).
 
 ## Example command line usage
 
-The only required arguments are tumor and normal bam files, corresponding sample names, a vcf file that includes those sample names, and an output directory.
+The only required arguments are tumor and normal bam files, corresponding sample 
+names, a vcf file that includes those sample names, and an output directory.
 
 ```bash
 run_cnv -t bams/23986.bam -n bams/23986N.bam \
@@ -90,18 +91,18 @@ optional arguments:
 
 ## Configuration
 
-You can modify the config.ini file in the python site-packages directory, which is set up for Yale's Ruddle cluster
-(October 2016):
+You can modify the config.ini file in the python site-packages directory, which 
+is set up for Yale's Ruddle / Farnam / McCleary clusters (October 2022):
 e.g. path_to_python_distribution/lib/python3.5/site-packages/cnv_pipeline/config.ini
 
 ```
 [paths]
-CODING_REGIONS = /ycga-ba/home/bioinfo/software/knightlab/genomes/hs37d5/bed_files/hs37d5_refgene_coding_Nov2015.bed
-FASTA = /ycga-ba/home/bioinfo/software/knightlab/genomes/hs37d5/human_g1k_v37_decoy.fasta
-PYTHON2 = /ycga-gpfs/apps/hpc/Langs/Python/2.7.11/bin/python
-SAMTOOLS = /ycga-gpfs/apps/hpc/Apps/SAMtools/1.3/bin/samtools
-ADTEX = /ycga-gpfs/project/fas/townsend/software/ADTEx.v.2.0/ADTEx_sgg.py
-BEDTOOLS = /ycga-gpfs/project/fas/townsend/software/bedtools-2.26.0/bedtools
+CODING_REGIONS = /gpfs/gibbs/pi/ycga/mane/jk2269/knightlab/genomes/hs37d5/bed_files/hs37d5_refgene_coding_Nov2015.bed
+FASTA = /gpfs/gibbs/pi/ycga/mane/jk2269/knightlab/genomes/hs37d5/human_g1k_v37_decoy.fasta
+PYTHON2 = /gpfs/ycga/apps/hpc/Langs/Python/2.7.11/bin/python2.7
+SAMTOOLS = samtools
+ADTEX = /gpfs/gibbs/pi/townsend/software/ADTEx.v.2.0/ADTEx_sgg.py
+BEDTOOLS = bedtools
 
 [gatk]
 cmd = java -Xmx12g -XX:ParallelGCThreads=8 -jar /home/ky89/ngstools/GenomeAnalysisTK-3.2-2/GenomeAnalysisTK.jar

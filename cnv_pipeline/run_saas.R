@@ -8,11 +8,11 @@ use.null.data <- as.logical(options[6])
 merge.pvalue.cutoff <- as.numeric(options[7])
 cnvcall.pvalue.cutoff <- as.numeric(options[8])
 
-dirname = 'saasCNV_results'
+dirname <- 'saasCNV_results'
 
-library(feather)
+library(arrow)
 setwd(sample_dir)
-vcf.data <- read_feather(seq_path)
+vcf.data <- read_parquet(seq_path)
 vcf.data$CHROM <- paste0('chr', vcf.data$CHROM)  # Add chr to chrom column
 
 ## NGS pipeline analysis
