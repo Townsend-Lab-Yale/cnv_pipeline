@@ -1,12 +1,12 @@
 import os
 os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 
-import cnv_pipeline.plot_chr_axis as pcnv
-
 import pandas as pd
 import matplotlib.pyplot as plt
-plt.style.use('ggplot')
 
+import cnv_pipeline.plot_chr_axis as pcnv
+
+plt.style.use('ggplot')
 
 g = pcnv.GenomeInfo()
 
@@ -28,8 +28,8 @@ def plot_case_cnv(case_id, tumor_ids=None, feather_dict=None, cnv_dict=None, dim
         axs: matplotlib axis handles.
     """
 
-    hf, axs = plt.subplots(len(tumor_ids), 1, figsize=(14,10), sharex=True,
-    #                        gridspec_kw={'height_ratios':[10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]},
+    hf, axs = plt.subplots(len(tumor_ids), 1, figsize=(14, 10), sharex=True,
+                           # gridspec_kw={'height_ratios':[10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]},
                            subplot_kw=AX_DICT)
     axs = [axs] if len(tumor_ids) == 1 else axs  # ensure axs is iterable.
     # for ax in axs:
