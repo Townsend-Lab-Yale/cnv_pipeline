@@ -10,17 +10,34 @@ Install into your python distribution (tested on python3).
 pip install git+https://github.com/sggaffney/cnv_pipeline.git
 ```
 
-Install required R packages, including saasCNV.
+### R setup
+
+- ADTEx requires `wmtsa`, which was removed from CRAN in 2020. The following 
+    instructions assume use of R 4.0.3, and specify the latest MRAN snapshot that
+    includes `wmtsa`. If you don't want to run ADTEx, later versions of R and 
+    CRAN could be used.
+- `saasCNV` is a CRAN package, still in CRAN as of 2022-07-28, and required 
+    dependencies are `DNAcopy` (from Bioconductor), and `RANN`.
+
 
 ```R
-source("https://bioconductor.org/biocLite.R")
-biocLite("DNAcopy")
-install.packages("RANN")
-install.packages("saasCNV")
-install.packages("feather")
+install.packages('BiocManager', repos='https://mran.microsoft.com/snapshot/2020-06-08')
+r <- BiocManager::repositories()
+r['CRAN'] = 'https://mran.microsoft.com/snapshot/2020-06-08'
+options(repos=r)
+install.packages(c('wmtsa', 'DNAcopy', 'RANN', 'saasCNV', 'arrow'), dependencies=TRUE)
 ```
 
-Install [ADTEx](https://sourceforge.net/projects/adtex/).
+- Manually install saasCNV using Rscript.
+```shell
+ Rscript -e 'install.packages("saasCNV", repos = "http://cran.us.r-project.org")'
+```
+
+### ADTEx installation
+
+The 2016 v2.0.0 version of [ADTEx](https://sourceforge.net/projects/adtex/) requires 
+python2. A python3-compatible version is available at https://github.com/Townsend-Lab-Yale/ADTEx.  
+
 
 ## Example command line usage
 
