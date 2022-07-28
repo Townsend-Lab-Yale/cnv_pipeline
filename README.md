@@ -116,10 +116,10 @@ e.g. path_to_python_distribution/lib/python3.5/site-packages/cnv_pipeline/config
 [paths]
 CODING_REGIONS = /gpfs/gibbs/pi/ycga/mane/jk2269/knightlab/genomes/hs37d5/bed_files/hs37d5_refgene_coding_Nov2015.bed
 FASTA = /gpfs/gibbs/pi/ycga/mane/jk2269/knightlab/genomes/hs37d5/human_g1k_v37_decoy.fasta
-PYTHON2 = /gpfs/ycga/apps/hpc/Langs/Python/2.7.11/bin/python2.7
+ADTEX = /gpfs/gibbs/pi/townsend/software/cnv_pipeline/ADTEx/ADTEx.py
 SAMTOOLS = samtools
-ADTEX = /gpfs/gibbs/pi/townsend/software/ADTEx.v.2.0/ADTEx_sgg.py
 BEDTOOLS = bedtools
+RSCRIPT = Rscript
 
 [gatk]
 cmd = java -Xmx12g -XX:ParallelGCThreads=8 -jar /home/ky89/ngstools/GenomeAnalysisTK-3.2-2/GenomeAnalysisTK.jar
