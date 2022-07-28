@@ -112,13 +112,14 @@ def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_pat
     ploidy_str = '--ploidy {}'.format(ploidy) if ploidy is not None else ''
 
     config = load_config()
-    python2_path = config.get('paths', 'PYTHON2', fallback='python2')
+    # python2_path = config.get('paths', 'PYTHON2', fallback='python2')
+    python_path = sys.executable
     adtex_script = config.get('paths', 'ADTEX', fallback='adtex.py')
 
-    cmd = ("{python2} {adtex_script} --DOC -n {normal_cov_path} -t {tumor_cov_path} "
+    cmd = ("{python_path} {adtex_script} --DOC -n {normal_cov_path} -t {tumor_cov_path} "
            "-o {adtex_dir} --baf {baf_path} --bed {target_path} --estimatePloidy --plot "
            "{ploidy_str} --minReadDepth {mrd}")
-    cmd = cmd.format(python2=python2_path,
+    cmd = cmd.format(python_path=python_path,
                      adtex_script=adtex_script,
                      normal_cov_path=normal_cov_path,
                      tumor_cov_path=tumor_cov_path,
