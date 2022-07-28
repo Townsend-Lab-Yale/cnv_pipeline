@@ -33,7 +33,7 @@ def prep_loh_dataframes(proj_dir):
         z (pd.DataFrame): raw zygosity dataframe, from ADTEx.
         loh_segs (pd.DataFrame): cnv intervals containing LOH SNPs.
     """
-    print("Building preliminary loh dataframes in {}".format(proj_dir))
+    print(f"Building preliminary loh dataframes in {proj_dir}")
     res_path = os.path.join(proj_dir, 'zygosity', 'zygosity.res')
     cnv_path = os.path.join(proj_dir, 'cnv.result')
     # TEMPORARY FILES
@@ -42,7 +42,7 @@ def prep_loh_dataframes(proj_dir):
     loh_bed = os.path.join(proj_dir, 'temp_loh_intervals.bed')
 
     z = pd.read_csv(res_path, sep='\t', dtype={'chrom': str})
-    z.chrom = z.chrom.astype('category', categories=chroms, ordered=True)
+    z.chrom = pd.Categorical(z.chrom, categories=chroms, ordered=True)
     # SAVE SNP BED FILE
     z_loh = z[z.zygosity == 'LOH']
     loh_snp_bed = pd.concat([z_loh.chrom, z_loh.SNP_loc - 1, z_loh.SNP_loc], axis=1)
@@ -64,7 +64,7 @@ def prep_loh_dataframes(proj_dir):
 
     loh_segs = pd.read_csv(loh_bed, sep='\t', header=None, 
                            names=['chrom', 'pos_start', 'pos_end'], dtype={'chrom': str})
-    loh_segs.chrom = loh_segs.chrom.astype('category', categories=chroms, ordered=True)
+    loh_segs.chrom = pd.Categorical(loh_segs.chrom, categories=chroms, ordered=True)
     loh_segs['orig_start'] = loh_segs['pos_start']
     loh_segs['orig_end'] = loh_segs['pos_end']
     
