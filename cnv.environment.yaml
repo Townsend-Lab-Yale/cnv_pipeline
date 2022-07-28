@@ -1,0 +1,21 @@
+name: r_cnv
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - r-base==4.0.5
+  - bioconductor-dnacopy
+  - r-rann
+  - r-arrow
+  - r-wmtsa  # note: removed from cran in 2020. for ADTEx.
+  - htslib
+  - samtools
+  - bedtools
+  - pip
+  - python=3
+  - numpy
+  - pandas
+  - pyarrow  # for parquet
+  - matplotlib
+# Also need install.packages("saasCNV") within R
