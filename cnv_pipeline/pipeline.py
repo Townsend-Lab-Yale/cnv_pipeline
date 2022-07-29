@@ -180,13 +180,16 @@ def main():
     parser.add_argument('-gq', '--min_gq', help='Genotype quality cutoff for normal sample [90]', type=int, default=90)
     # ADTEx-specific
     parser.add_argument('-a', '--adtex_dir', help='ADTEx: output dir', default=None)
-    parser.add_argument('-b', '--bed', help='ADTEx: BED file for targeted regions', default=None)
+    parser.add_argument('-b', '--bed', help='ADTEx: BED file for targeted regions [REQUIRED FOR ADTEx]', default=None)
     parser.add_argument("--ploidy", help="ADTEx: most common ploidy in the tumour sample", type=int, default=None)
     parser.add_argument("--minReadDepth", help="The ADTEx threshold for minimum read depth for each exon [10]",
                         type=int, default=10)
     parser.add_argument('-ao', '--adtex_stdout', help='ADTEx stdout path if overriding STDOUT', default='-')
 
     args = parser.parse_args()
+    if not args.saas_only and args.bed is None:
+        raise BEDFileNotFoundError("You must supply a BED file for targeted regions "
+                                   "(--bed) when not using --saas_only")
     vcf_dict = dict(ratio_min=args.ratio_min, ratio_max=args.ratio_max,
                     min_tumor=args.min_tumor, min_normal=args.min_normal,
                     min_gq=args.min_gq)
@@ -201,6 +204,10 @@ def main():
 
 
 class AdtexNotFoundError(Exception):
+    pass
+
+
+class BEDFileNotFoundError(Exception):
     pass
 
 
