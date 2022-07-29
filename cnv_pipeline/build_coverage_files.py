@@ -2,17 +2,12 @@ import os
 import subprocess
 import shlex
 
-from .config import load_config
-
 
 def build_genome_file(sample_bam=None, genome_path=None):
     """Build genome file for use with bedtools coverage --sorted mode."""
 
-    config = load_config()
-    sam_path = config.get('paths', 'SAMTOOLS', fallback='samtools')
-
     """samtools view -H {bam} | grep -P "@SQ\tSN:" | sed 's/@SQ\tSN://' | sed 's/\tLN:/\t/' > {genome_path}"""
-    cmd1 = "{sam_path} view -H {bam}".format(sam_path=sam_path, bam=sample_bam)
+    cmd1 = f"samtools view -H {sample_bam}"
     cmd2 = 'grep -P "@SQ\tSN:"'
     cmd3 = "sed 's/@SQ\tSN://'"
     cmd4 = "sed 's/\tLN:/\t/'"
@@ -33,12 +28,6 @@ def build_coverage_files(tumor_bam=None, normal_bam=None, genome_path=None,
     bedtools coverage -g $g -d -sorted -a $CODING_REGIONS -b normal.bam > cov_normal.bed;
     bedtools coverage -g $g -d -sorted -a $CODING_REGIONS -b tumor.bam > cov_tumor.bed;
     """
-
-    config = load_config()
-    bedtools_path = config.get('paths', 'BEDTOOLS', fallback='bedtools')
-
-    cmd_template = "{bedtools_path} coverage -g {g} -d -sorted -a {target} -b {bam}"
-
     for (bam, out_path, which) in [(tumor_bam, tumor_cov_path, 'tumor'),
                                    (normal_bam, normal_cov_path, 'normal')]:
         if os.path.exists(out_path):
@@ -47,8 +36,9 @@ def build_coverage_files(tumor_bam=None, normal_bam=None, genome_path=None,
         else:
             print("Generating coverage for {}".format(bam))
             with open(out_path, 'w') as out:
-                cmd = cmd_template.format(bedtools_path=bedtools_path, g=genome_path,
-                                          target=target_bed_path, bam=bam)
+                cmd_template = "bedtools coverage -g {g} -d -sorted -a {target} -b {bam}"
+                cmd = cmd_template.format(g=genome_path, target=target_bed_path,
+                                          bam=bam)
                 print("...bedtools command: {}".format(cmd))
                 proc = subprocess.Popen(shlex.split(cmd), stdin=subprocess.DEVNULL, stdout=out)
                 proc.communicate()

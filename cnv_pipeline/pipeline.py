@@ -7,7 +7,6 @@ import contextlib
 
 from .baf_from_vcf import baf_from_vcf
 from .build_coverage_files import build_genome_file, build_coverage_files
-from .config import load_config, this_dir
 from .get_loh_intervals_adtex import finalize_loh
 from .trim_vcf import trim_vcf
 
@@ -38,9 +37,6 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
         adtex_dir = os.path.join(sample_dir, 'adtex_output')
     if chroms is None:
         chroms = '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,MT'
-    if target_path is None:
-        config = load_config()
-        target_path = config.get('paths', 'CODING_REGIONS')
     if vcf_out is None:
         vcf_out = os.path.join(sample_dir, "snps_trimmed.vcf")
     genome_path = os.path.join(sample_dir, "genome.txt")
@@ -55,7 +51,7 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
 
     baf_from_vcf(vcf_out, baf_path, parquet_path=parquet_path,
                  tumor_id=tumor_id, normal_id=normal_id,
-                 mq_cutoff=mq_cutoff, chroms=chroms)
+                 mq_cutoff=mq_cutoff, chroms_str=chroms)
 
     run_saasCNV(sample_id=sample_id, sample_dir=sample_dir,
                 baf_path=parquet_path, stdout_path='-')
@@ -87,7 +83,7 @@ def run_saasCNV(sample_id=None, sample_dir=None, baf_path=None, stdout_path='-')
     rscript_path = config.get('paths', 'RSCRIPT', fallback='Rscript')
     sample_path = os.path.realpath(sample_dir)
     baf_path = os.path.realpath(baf_path)
-    cmd = (f"{rscript_path} {script_path} {sample_id} {sample_path} {baf_path}"
+    cmd = (f"Rscript {script_path} {sample_id} {sample_path} {baf_path}"
            " 50 30 FALSE 0.05 0.05")
     print("Running saasCNV with command:\n  {}".format(cmd))
     args = shlex.split(cmd)
@@ -111,13 +107,11 @@ def run_adtex(normal_cov_path=None, tumor_cov_path=None, adtex_dir=None, baf_pat
         stdout_path = '-'  # will write to stdout
     ploidy_str = '--ploidy {}'.format(ploidy) if ploidy is not None else ''
 
-    config = load_config()
-    python_path = config.get('paths', 'PYTHON', fallback=sys.executable)
-    adtex_script = config.get('paths', 'ADTEX', fallback='adtex.py')
+    adtex_script = _locate_adtex_script()
     cmd = ("{python_path} {adtex_script} --DOC -n {normal_cov_path} -t {tumor_cov_path} "
            "-o {adtex_dir} --baf {baf_path} --bed {target_path} --estimatePloidy --plot "
            "{ploidy_str} --minReadDepth {mrd}")
-    cmd = cmd.format(python_path=python_path,
+    cmd = cmd.format(python_path=sys.executable,
                      adtex_script=adtex_script,
                      normal_cov_path=normal_cov_path,
                      tumor_cov_path=tumor_cov_path,
@@ -146,6 +140,17 @@ def smart_open(filename=None):
     finally:
         if fh is not sys.stdout:
             fh.close()
+
+
+def _locate_adtex_script():
+    """Check for ADTEX_DIR in env, with fallback to subdirectory of cnv_pipeline."""
+    default_dir = os.path.join(PKG_DIR_PATH, 'ADTEx')
+    adtex_dir = os.environ.get('ADTEX_DIR', default_dir)
+    script_path = os.path.join(adtex_dir, 'ADTEx.py')
+    if not os.path.exists(script_path):
+        raise AdtexNotFoundError(
+            "Specify ADTEX_DIR in env or make ADTEx folder a "
+            f"subdirectory of {PKG_DIR_PATH}.")
 
 
 def main():
@@ -182,4 +187,11 @@ def main():
             tumor_id=args.tumor_id, normal_id=args.normal_id,
             saas_only=args.saas_only,
             ploidy=args.ploidy, min_read_depth=args.minReadDepth,
-            adtex_stdout=args.adtex_stdout, sample_id=args.tumor_id, **vcf_dict)
+            adtex_stdout=args.adtex_stdout, **vcf_dict)
+
+
+class AdtexNotFoundError(Exception):
+    pass
+
+
+PKG_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
