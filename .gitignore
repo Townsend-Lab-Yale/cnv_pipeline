@@ -4,3 +4,4 @@ extras
 project_scripts
 .DS_Store
 ADTEx
+*.egg-info
