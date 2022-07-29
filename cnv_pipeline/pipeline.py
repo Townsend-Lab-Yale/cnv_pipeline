@@ -151,6 +151,7 @@ def _locate_adtex_script():
         raise AdtexNotFoundError(
             "Specify ADTEX_DIR in env or make ADTEx folder a "
             f"subdirectory of {PKG_DIR_PATH}.")
+    return script_path
 
 
 def main():
