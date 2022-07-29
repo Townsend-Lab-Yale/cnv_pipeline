@@ -19,7 +19,6 @@ DTYPE_DICT = {'ALT': str,
               'Tumor.REF.DP': int,
               }
 
-CHROMS_STR = '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,MT'
 
 def get_vcf_properties(vcf_path, tumor_id=None, normal_id=None):
     """Locate tumor and normal columns. Identify AD index within FORMAT."""
@@ -58,7 +57,7 @@ def parse_format(f, col_gt=0, col_ad=1):
 
 
 def baf_from_vcf(vcf_path, baf_path, parquet_path=None, tumor_id=None, normal_id=None,
-                 mq_cutoff=30, chroms=CHROMS_STR) -> None:
+                 mq_cutoff=30, chroms_str=None) -> None:
     """Args:
         patient_id (str): used for saving saasCNV-style snp data to feather.
         vcf_path (str): full or relative vcf path
@@ -69,7 +68,7 @@ def baf_from_vcf(vcf_path, baf_path, parquet_path=None, tumor_id=None, normal_id
     Intermediate files:
         <baf_path>.feather: created by vcf2table.R
     """
-    chrom_list = chroms.split(',')
+    chrom_list = chroms_str.split(',')
     if parquet_path is None:
         parquet_path = baf_path + '.parquet'
     v = get_vcf_properties(vcf_path=vcf_path, tumor_id=tumor_id,
