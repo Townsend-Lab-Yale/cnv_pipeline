@@ -153,26 +153,25 @@ def main():
         __package__ = "cnv_pipeline"
 
     parser = argparse.ArgumentParser("CNV PIPELINE")
-    parser.add_argument('-v', '--vcf', help='VCF file for sample pair [REQUIRED]')
-    parser.add_argument('-s', '--sample_dir', help='Sample-specific intermediate output dir [OPTIONAL]', required=True)
+    parser.add_argument('-v', '--vcf', help='VCF file for sample pair', required=True)
+    parser.add_argument('-s', '--sample_dir', help='Sample-specific output dir', required=True)
     parser.add_argument('-t', '--tumor', help='Tumor BAM', required=False)
     parser.add_argument('-n', '--normal', help='Normal BAM', required=False)
-
-    parser.add_argument('--saas_only', help='Only run saasCNV, not ADTEx.',
-                        action='store_true', default=False)
-
-    parser.add_argument('-a', '--adtex_dir', help='ADTEx output dir', default=None)
     parser.add_argument('-tid', '--tumor_id', help='Tumor name, for vcf extraction', required=True)
-    parser.add_argument('-nid', '--normal_id', help='Normal name, for vcf extraction', default=None)
+    parser.add_argument('-nid', '--normal_id', help='Normal name, for vcf extraction', required=True)
+
+    parser.add_argument('--saas_only', help='Only run saasCNV, not ADTEx.', action='store_true', default=False)
+
     parser.add_argument('-rmin', '--ratio_min', help='Min alt ratio in normal sample [0.4]', type=float, default=0.4)
     parser.add_argument('-rmax', '--ratio_max', help='Max alt ratio in normal sample [0.6]', type=float, default=0.6)
     parser.add_argument('-tmin', '--min_tumor', help='Min reads from tumor sample [20]', type=int, default=20)
     parser.add_argument('-nmin', '--min_normal', help='Min reads from normal sample [10]', type=int, default=10)
     parser.add_argument('-gq', '--min_gq', help='Genotype quality cutoff for normal sample [90]', type=int, default=90)
+    parser.add_argument('-a', '--adtex_dir', help='ADTEx output dir', default=None)
     parser.add_argument("--ploidy", help="Most common ploidy in the tumour sample", type=int, default=None)
-    parser.add_argument("--minReadDepth", help="The threshold for minimum read depth for each exon [10]",
+    parser.add_argument("--minReadDepth", help="The ADTEx threshold for minimum read depth for each exon [10]",
                         type=int, default=10)
-    parser.add_argument('-ao', '--adtex_stdout', help='ADTEx stdout path', default='-')
+    parser.add_argument('-ao', '--adtex_stdout', help='ADTEx stdout path if overriding STDOUT', default='-')
 
     args = parser.parse_args()
     vcf_dict = dict(ratio_min=args.ratio_min, ratio_max=args.ratio_max,
