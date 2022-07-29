@@ -1,6 +1,7 @@
 import os
 import sys
 import shlex
+import pathlib
 import subprocess
 import argparse
 import contextlib
@@ -143,7 +144,7 @@ def smart_open(filename=None):
 
 def _locate_adtex_script():
     """Check for ADTEX_DIR in env, with fallback to subdirectory of cnv_pipeline."""
-    default_dir = os.path.join(PKG_DIR_PATH, 'ADTEx')
+    default_dir = pathlib.Path(PKG_DIR_PATH).parent.joinpath('ADTEx')
     adtex_dir = os.environ.get('ADTEX_DIR', default_dir)
     script_path = os.path.join(adtex_dir, 'ADTEx.py')
     if not os.path.exists(script_path):
