@@ -16,7 +16,8 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
             baf_path=None, parquet_path=None, tumor_cov_path=None, normal_cov_path=None,
             tumor_id=None, normal_id=None,
             ref_fasta=None,
-            saas_only=False, adtex_stdout='-', bed_targets=None,
+            saas_only=False, adtex_only=False,
+            adtex_stdout='-', bed_targets=None,
             mq_cutoff=30, chroms=None, vcf_out=None,
             ploidy=None, min_read_depth=10,
             ratio_min=0.4, ratio_max=0.6, min_tumor=20, min_normal=10, min_gq=90):
@@ -55,8 +56,9 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
                  tumor_id=tumor_id, normal_id=normal_id,
                  mq_cutoff=mq_cutoff, chroms_str=chroms)
 
-    run_saasCNV(sample_id=tumor_id, sample_dir=sample_dir,
-                baf_path=parquet_path, stdout_path='-')
+    if not adtex_only:
+        run_saasCNV(sample_id=tumor_id, sample_dir=sample_dir,
+                    baf_path=parquet_path, stdout_path='-')
 
     if not saas_only:
         build_genome_file(sample_bam=normal_bam, genome_path=genome_path)
@@ -74,6 +76,7 @@ def run_cnv(vcf_path, sample_dir=None, adtex_dir=None, tumor_bam=None, normal_ba
                   stdout_path=adtex_stdout)
 
         finalize_loh(adtex_dir)
+    print("CNV PIPELINE COMPLETE.")
 
 
 def run_saasCNV(sample_id=None, sample_dir=None, baf_path=None, stdout_path='-'):
@@ -166,7 +169,9 @@ def main():
     parser.add_argument('-tid', '--tumor_id', help='Tumor name, for vcf extraction', required=True)
     parser.add_argument('-nid', '--normal_id', help='Normal name, for vcf extraction', required=True)
     parser.add_argument('-R', '--ref_fasta', help='Reference genome fasta path', required=True)
-    parser.add_argument('--saas_only', help='Only run saasCNV, not ADTEx.', action='store_true', default=False)
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--saas_only', help='Only run saasCNV, not ADTEx.', action='store_true', default=False)
+    group.add_argument('--adtex_only', help='Only run ADTEx, not saasCNV.', action='store_true', default=False)
     # VCF filtering arguments
     parser.add_argument('-rmin', '--ratio_min', help='Min alt ratio in normal sample [0.4]', type=float, default=0.4)
     parser.add_argument('-rmax', '--ratio_max', help='Max alt ratio in normal sample [0.6]', type=float, default=0.6)
@@ -190,7 +195,7 @@ def main():
             tumor_id=args.tumor_id, normal_id=args.normal_id,
             ref_fasta=args.ref_fasta,
             bed_targets=args.bed,
-            saas_only=args.saas_only,
+            saas_only=args.saas_only, adtex_only=args.adtex_only,
             ploidy=args.ploidy, min_read_depth=args.minReadDepth,
             adtex_stdout=args.adtex_stdout, **vcf_dict)
 
