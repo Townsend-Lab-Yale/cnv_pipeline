@@ -159,11 +159,11 @@ def main():
     parser = argparse.ArgumentParser("CNV PIPELINE")
     parser.add_argument('-v', '--vcf', help='VCF file for sample pair', required=True)
     parser.add_argument('-s', '--sample_dir', help='Sample-specific output dir', required=True)
-    parser.add_argument('-t', '--tumor', help='Tumor BAM', required=True)
-    parser.add_argument('-n', '--normal', help='Normal BAM', required=True)
+    parser.add_argument('-t', '--tumor_bam', help='Tumor BAM', required=True)
+    parser.add_argument('-n', '--normal_bam', help='Normal BAM', required=True)
     parser.add_argument('-tid', '--tumor_id', help='Tumor name, for vcf extraction', required=True)
     parser.add_argument('-nid', '--normal_id', help='Normal name, for vcf extraction', required=True)
-    parser.add_argument('-R', '--ref-fasta', help='Reference genome fasta path', required=True)
+    parser.add_argument('-R', '--ref_fasta', help='Reference genome fasta path', required=True)
     parser.add_argument('--saas_only', help='Only run saasCNV, not ADTEx.', action='store_true', default=False)
     # VCF filtering arguments
     parser.add_argument('-rmin', '--ratio_min', help='Min alt ratio in normal sample [0.4]', type=float, default=0.4)
@@ -184,7 +184,7 @@ def main():
                     min_tumor=args.min_tumor, min_normal=args.min_normal,
                     min_gq=args.min_gq)
     run_cnv(vcf_path=args.vcf, sample_dir=args.sample_dir, adtex_dir=args.adtex_dir,
-            tumor_bam=args.tumor, normal_bam=args.normal,
+            tumor_bam=args.tumor_bam, normal_bam=args.normal_bam,
             tumor_id=args.tumor_id, normal_id=args.normal_id,
             ref_fasta=args.ref_fasta,
             bed_targets=args.bed,
